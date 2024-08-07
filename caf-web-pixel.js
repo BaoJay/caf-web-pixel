@@ -23,9 +23,10 @@ console.log("Rendering pixel from Github");
 );
 fbq("init", "1796727657413629"); // Bao Testing 3629
 
-window.pixelCallBackEvent = function (event) {
+function pixelCallBackEvent(event) {
   console.log("pixelCallBackEvent event === ", event);
-};
+}
+window.pixelCallBackEvent = pixelCallBackEvent;
 
 // analytics.subscribe("all_events", (event) => {
 //   let payload;
