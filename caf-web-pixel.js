@@ -23,8 +23,10 @@ console.log("Rendering pixel from Github");
 );
 fbq("init", "1796727657413629"); // Bao Testing 3629
 
-const data = await localStorage.getItem("CAF_DATA_TRIGGER_EVENT");
-console.log("data =====", JSON.parse(data));
+const data = JSON.parse(localStorage.getItem("CAF_DATA_TRIGGER_EVENT"));
+const pixelID = JSON.parse(localStorage.getItem("CAF_PIXEL_ID"));
+console.log("data =====", data);
+console.log("pixelID =====", pixelID);
 
 function pixelCallBackEvent(event) {
   console.log("pixelCallBackEvent event === ", event);
