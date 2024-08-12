@@ -28,11 +28,6 @@ const pixelID = JSON.parse(localStorage.getItem("CAF_PIXEL_ID"));
 console.log("data =====", data);
 console.log("pixelID =====", pixelID);
 
-function pixelCallBackEvent(event) {
-  console.log("pixelCallBackEvent event === ", event);
-}
-window.pixelCallBackEvent = pixelCallBackEvent;
-
 // analytics.subscribe("all_events", (event) => {
 //   let payload;
 //   console.log("event name === ", event.name);
