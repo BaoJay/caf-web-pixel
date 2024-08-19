@@ -1,32 +1,39 @@
 console.log("caf-web-pixel.js is running");
 console.log("Rendering pixel from Github");
-(function (window, document) {
-  if (!window.fbq) {
-    const fbq = function () {
-      if (fbq.callMethod) {
-        fbq.callMethod.apply(fbq, arguments);
-      } else {
-        fbq.queue.push(arguments);
+class FacebookPixel {
+  constructor(window, document) {
+    if (!window.fbq) {
+      const fbq = (...args) => {
+        if (fbq.callMethod) {
+          fbq.callMethod(...args);
+        } else {
+          fbq.queue.push(args);
+        }
+      };
+
+      if (!window._fbq) {
+        window._fbq = fbq;
       }
-    };
 
-    if (!window._fbq) {
-      window._fbq = fbq;
+      fbq.push = fbq;
+      fbq.loaded = true;
+      fbq.version = "2.0";
+      fbq.queue = [];
+
+      const script = document.createElement("script");
+      script.async = true;
+      script.src = "https://connect.facebook.net/en_US/fbevents.js";
+
+      const firstScript = document.getElementsByTagName("script")[0];
+      firstScript.parentNode.insertBefore(script, firstScript);
+
+      console.log("Pixel is loaded");
     }
-
-    fbq.push = fbq;
-    fbq.loaded = true;
-    fbq.version = "2.0";
-    fbq.queue = [];
-
-    const script = document.createElement("script");
-    script.async = true;
-    script.src = "https://connect.facebook.net/en_US/fbevents.js";
-
-    const firstScript = document.getElementsByTagName("script")[0];
-    firstScript.parentNode.insertBefore(script, firstScript);
   }
-})(window, document);
+}
+
+// Instantiate the class to execute the code
+new FacebookPixel(window, document);
 fbq("init", "1796727657413629"); // Bao Testing 3629
 
 const data = JSON.parse(localStorage.getItem("CAF_DATA_TRIGGER_EVENT"));
