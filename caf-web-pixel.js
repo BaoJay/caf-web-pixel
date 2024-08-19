@@ -1,5 +1,12 @@
 console.log("caf-web-pixel.js is running");
 console.log("Rendering pixel from Github");
+
+const data = JSON.parse(localStorage.getItem("CAF_DATA_TRIGGER_EVENT"));
+const pixelID = JSON.parse(localStorage.getItem("CAF_PIXEL_ID"));
+console.log("data =====", data);
+console.log("pixelID =====", pixelID);
+const accountID = pixelID.pixelID;
+
 !(function (f, b, e, v, n, t, s) {
   if (f.fbq) return;
   n = f.fbq = function () {
@@ -24,12 +31,11 @@ console.log("Rendering pixel from Github");
   "https://connect.facebook.net/en_US/fbevents.js"
 );
 
-fbq("init", "1796727657413629"); // Bao Testing 3629
+fbq("init", accountID); // Bao Testing 3629
 
-const data = JSON.parse(localStorage.getItem("CAF_DATA_TRIGGER_EVENT"));
-const pixelID = JSON.parse(localStorage.getItem("CAF_PIXEL_ID"));
-console.log("data =====", data);
-console.log("pixelID =====", pixelID);
+analytics.subscribe("all_events", (event) => {
+  console.log("subscribe event in external js === ", event.name);
+});
 
 // analytics.subscribe("all_events", (event) => {
 //   let payload;
