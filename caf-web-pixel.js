@@ -22,65 +22,70 @@
 );
 
 window.otfbq = async function () {
-  var e, o, n, a;
-  if (
-    0 < arguments.length &&
-    ("string" == typeof arguments[0] && (e = arguments[0]),
-    "string" == typeof arguments[1] && (o = arguments[1]),
-    "object" == typeof arguments[2] && (n = arguments[2]),
-    void 0 !== arguments[3] && (a = arguments[3]),
-    void 0 !== arguments[4] && (nameCustomEvent = arguments[4]),
-    ("" != a && void 0 !== a) || (a = new Date().getTime()),
-    "string" == typeof e &&
-      "" != e.replace(/\s+/gi, "") &&
-      "string" == typeof o &&
-      o.replace(/\s+/gi, ""))
-  ) {
-    let t = {
-      data: "testing based on otfbq",
-    };
-    console.log("otfbq is defined");
-    console.log("e === ", e);
-    console.log("o === ", o);
-    console.log("n === ", n);
-    console.log("a === ", a);
-    fbq("init", o); // My Pixel ID
-    fbq(e, o, a);
+  if (arguments.length > 0) {
+    let e, o, n, a, nameCustomEvent;
 
-    switch ((fbq("init", e, t), o)) {
-      case "PageView":
-        console.log("track page view event");
-        fbq(
-          "trackSingle",
-          e,
-          "PageView",
-          {},
-          {
+    if (typeof arguments[0] === "string") e = arguments[0];
+    if (typeof arguments[1] === "string") o = arguments[1];
+    if (typeof arguments[2] === "object") n = arguments[2];
+    if (arguments[3] !== undefined) a = arguments[3];
+    if (arguments[4] !== undefined) nameCustomEvent = arguments[4];
+
+    if (!a || a === "") {
+      a = new Date().getTime();
+    }
+
+    if (
+      typeof e === "string" &&
+      e.trim() !== "" &&
+      typeof o === "string" &&
+      o.trim() !== ""
+    ) {
+      let t = {
+        data: "testing based on otfbq",
+      };
+      console.log("otfbq is defined");
+      console.log("e === ", e);
+      console.log("o === ", o);
+      console.log("n === ", n);
+      console.log("a === ", a);
+      fbq("init", o); // My Pixel ID
+
+      switch ((fbq("init", e, t), o)) {
+        case "PageView":
+          console.log("track page view event");
+          fbq(
+            "trackSingle",
+            e,
+            "PageView",
+            {},
+            {
+              eventID: a,
+            }
+          );
+          break;
+        case "ViewContent":
+        case "Search":
+        case "AddToCart":
+        case "InitiateCheckout":
+        case "AddPaymentInfo":
+        case "Lead":
+        case "CompleteRegistration":
+        case "Purchase":
+        case "AddToWishlist":
+          console.log("track standard events");
+          fbq("trackSingle", e, o, n, {
             eventID: a,
-          }
-        );
-        break;
-      case "ViewContent":
-      case "Search":
-      case "AddToCart":
-      case "InitiateCheckout":
-      case "AddPaymentInfo":
-      case "Lead":
-      case "CompleteRegistration":
-      case "Purchase":
-      case "AddToWishlist":
-        console.log("track standard events");
-        fbq("trackSingle", e, o, n, {
-          eventID: a,
-        });
-        break;
-      case "trackCustom":
-        fbq("trackSingle", e, nameCustomEvent, n, {
-          eventID: a,
-        });
-        break;
-      default:
-        return;
+          });
+          break;
+        case "trackCustom":
+          fbq("trackSingle", e, nameCustomEvent, n, {
+            eventID: a,
+          });
+          break;
+        default:
+          return;
+      }
     }
   }
 };
