@@ -84,7 +84,7 @@ window.otfbq = async function () {
     }
   }
 };
-console.log("arguments", arguments);
+otfbq("1796727657413629", "PageView", {}, "asdf1265x7vcq123");
 
 // Step 2. Only define and subscribe to the event on the Checkout page
 analytics.subscribe("checkout_started", async (event) => {
@@ -93,8 +93,4 @@ analytics.subscribe("checkout_started", async (event) => {
   if (currentPathname.includes("/checkouts")) {
     otfbq("1796727657413629", "InitiateCheckout", {}, "asdf1265x7vcq123");
   }
-});
-
-analytics.subscribe("page_viewed", async (event) => {
-  otfbq("1796727657413629", "PageView", {}, "asdf1265x7vcq123");
 });
