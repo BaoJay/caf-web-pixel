@@ -86,11 +86,6 @@ window.otfbq = async function () {
 };
 otfbq("1796727657413629", "PageView", {}, "asdf1265x7vcq123");
 
-// Step 2. Only define and subscribe to the event on the Checkout page
-analytics.subscribe("checkout_started", async (event) => {
-  const currentPathname = event?.context?.document?.location?.pathname;
-
-  if (currentPathname.includes("/checkouts")) {
-    otfbq("1796727657413629", "InitiateCheckout", {}, "asdf1265x7vcq123");
-  }
-});
+if (window.href.location.includes("/checkouts")) {
+  otfbq("1796727657413629", "InitiateCheckout", {}, "asdf1265x7vcq123");
+}
