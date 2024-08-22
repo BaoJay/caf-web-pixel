@@ -90,6 +90,8 @@ window.otfbq = async function () {
   }
 };
 otfbq("1796727657413629", "PageView", {}, "asdf1265x7vcq123");
+otfbq("1796727657413629", "ViewContent", {}, "asdf1265x7vcq123");
+otfbq("1796727657413629", "AddToCart", {}, "asdf1265x7vcq123");
 
 if (window.location.href.includes("/checkouts")) {
   otfbq("1796727657413629", "InitiateCheckout", {}, "asdf1265x7vcq123");
