@@ -23,44 +23,44 @@
 
 window.otfbq = async function () {
   if (arguments.length > 0) {
-    let e, o, n, a, nameCustomEvent;
+    let pixelID, eventName, payload, eventID, nameCustomEvent;
 
-    if (typeof arguments[0] === "string") e = arguments[0];
-    if (typeof arguments[1] === "string") o = arguments[1];
-    if (typeof arguments[2] === "object") n = arguments[2];
-    if (arguments[3] !== undefined) a = arguments[3];
+    if (typeof arguments[0] === "string") pixelID = arguments[0];
+    if (typeof arguments[1] === "string") eventName = arguments[1];
+    if (typeof arguments[2] === "object") payload = arguments[2];
+    if (arguments[3] !== undefined) eventID = arguments[3];
     if (arguments[4] !== undefined) nameCustomEvent = arguments[4];
 
-    if (!a || a === "") {
-      a = new Date().getTime();
+    if (!eventID || eventID === "") {
+      eventID = new Date().getTime();
     }
 
     if (
-      typeof e === "string" &&
-      e.trim() !== "" &&
-      typeof o === "string" &&
-      o.trim() !== ""
+      typeof pixelID === "string" &&
+      pixelID.trim() !== "" &&
+      typeof eventName === "string" &&
+      eventName.trim() !== ""
     ) {
       let t = {
         data: "testing based on otfbq",
       };
+      payload = { ...payload, ...t };
       console.log("otfbq is defined");
-      console.log("e === ", e);
-      console.log("o === ", o);
-      console.log("n === ", n);
-      console.log("a === ", a);
-      fbq("init", o); // My Pixel ID
+      console.log("pixelID === ", pixelID);
+      console.log("eventName === ", eventName);
+      console.log("payload === ", payload);
+      console.log("eventID === ", eventID);
 
-      switch ((fbq("init", e, t), o)) {
+      switch ((fbq("init", pixelID, t), eventName)) {
         case "PageView":
           console.log("track page view event");
           fbq(
             "trackSingle",
-            e,
+            pixelID,
             "PageView",
-            {},
+            payload,
             {
-              eventID: a,
+              eventID: eventID,
             }
           );
           break;
@@ -74,13 +74,13 @@ window.otfbq = async function () {
         case "Purchase":
         case "AddToWishlist":
           console.log("track standard events");
-          fbq("trackSingle", e, o, n, {
-            eventID: a,
+          fbq("trackSingle", pixelID, eventName, payload, {
+            eventID: eventID,
           });
           break;
         case "trackCustom":
-          fbq("trackSingle", e, nameCustomEvent, n, {
-            eventID: a,
+          fbq("trackSingle", pixelID, nameCustomEvent, payload, {
+            eventID: eventID,
           });
           break;
         default:
