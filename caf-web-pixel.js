@@ -46,10 +46,7 @@ window.otfbq = async function () {
       };
       payload = { ...payload, ...t };
       console.log("otfbq is defined");
-      console.log("pixelID === ", pixelID);
-      console.log("eventName === ", eventName);
-      console.log("payload === ", payload);
-      console.log("eventID === ", eventID);
+      console.log("pixelID === ", pixelID, "\neventName === ", eventName, "\npayload === ", payload, "\neventID === ", eventID);
 
       switch ((fbq("init", pixelID, t), eventName)) {
         case "PageView":
@@ -90,9 +87,9 @@ window.otfbq = async function () {
   }
 };
 otfbq("1796727657413629", "PageView", {}, "asdf1265x7vcq123");
-otfbq("1796727657413629", "ViewContent", {}, "asdf1265x7vcq123");
-otfbq("1796727657413629", "AddToCart", {}, "asdf1265x7vcq123");
 
 if (window.location.href.includes("/checkouts")) {
   otfbq("1796727657413629", "InitiateCheckout", {}, "asdf1265x7vcq123");
-}
+} else if (window.location.href.includes("/products")) {
+  otfbq("1796727657413629", "ViewContent", {}, "asdf1265x7vcq123");
+} 
