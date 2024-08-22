@@ -52,20 +52,25 @@ window.otfbq = async function () {
       };
       payload = { ...payload, ...t };
       console.log("otfbq is defined");
-      console.log("pixelID === ", pixelID, "\neventName === ", eventName, "\npayload === ", payload, "\neventID === ", eventID);
-
-      switch ((fbq("init", pixelID, t), eventName)) {
+      console.log(
+        "pixelID === ",
+        pixelID,
+        "\neventName === ",
+        eventName,
+        "\npayload === ",
+        payload,
+        "\neventID === ",
+        eventID
+      );
+      // Initialize the Facebook Pixel
+      fbq("init", pixelID, t);
+      // Use a switch statement to handle different event names
+      switch (eventName) {
         case "PageView":
           console.log("track page view event");
-          fbq(
-            "trackSingle",
-            pixelID,
-            "PageView",
-            payload,
-            {
-              eventID: eventID,
-            }
-          );
+          fbq("trackSingle", pixelID, "PageView", payload, {
+            eventID: eventID,
+          });
           break;
         case "ViewContent":
         case "Search":
@@ -98,4 +103,4 @@ if (window.location.href.includes("/checkouts")) {
   otfbq(metaPixelID, "InitiateCheckout", {});
 } else if (window.location.href.includes("/products")) {
   otfbq(metaPixelID, "ViewContent", {});
-} 
+}
