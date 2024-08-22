@@ -1,3 +1,9 @@
+const data = JSON.parse(localStorage.getItem("CAF_DATA_TRIGGER_EVENT"));
+const pixelID = JSON.parse(localStorage.getItem("CAF_PIXEL_ID"));
+console.log("data =====", data);
+console.log("pixelID =====", pixelID);
+const accountID = pixelID.pixelID;
+
 // Step 1. Initialize the JavaScript pixel SDK (make sure to exclude HTML)
 !(function (f, b, e, v, n, t, s) {
   if (f.fbq) return;
