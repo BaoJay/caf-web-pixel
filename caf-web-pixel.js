@@ -2,7 +2,7 @@ const data = JSON.parse(localStorage.getItem("CAF_DATA_TRIGGER_EVENT"));
 const pixelID = JSON.parse(localStorage.getItem("CAF_PIXEL_ID"));
 console.log("data =====", data);
 console.log("pixelID =====", pixelID);
-const accountID = pixelID.pixelID;
+const metaPixelID = pixelID.accountID;
 
 // Step 1. Initialize the JavaScript pixel SDK (make sure to exclude HTML)
 !(function (f, b, e, v, n, t, s) {
@@ -92,10 +92,10 @@ window.otfbq = async function () {
     }
   }
 };
-otfbq("1796727657413629", "PageView", {}, "asdf1265x7vcq123");
+otfbq(metaPixelID, "PageView", {});
 
 if (window.location.href.includes("/checkouts")) {
-  otfbq("1796727657413629", "InitiateCheckout", {}, "asdf1265x7vcq123");
+  otfbq(metaPixelID, "InitiateCheckout", {});
 } else if (window.location.href.includes("/products")) {
-  otfbq("1796727657413629", "ViewContent", {}, "asdf1265x7vcq123");
+  otfbq(metaPixelID, "ViewContent", {});
 } 
