@@ -7,6 +7,7 @@ function getLocalStorageData(key) {
 const data = getLocalStorageData("CAF_DATA_TRIGGER_EVENT");
 const pageViewedData = getLocalStorageData("TEST_DATA_PAGE_VIEWED_EVENT");
 const pixelID = getLocalStorageData("CAF_PIXEL_ID");
+const EVENT_CHECKOUT = getLocalStorageData("TEST_DATA_TRIGGER_CHECKOUT");
 
 console.log("pageViewedData =====", pageViewedData);
 const metaPixelID = pixelID.accountID;
@@ -109,8 +110,18 @@ window.gbfbq = async function (
 };
 gbfbq(metaPixelID, "PageView", {});
 
+function giabaoCallBackCheckout(event) {
+  console.log("giabaoCallBackCheckout === ", event);
+  gbfbq(metaPixelID, "InitiateCheckout", event.data);
+}
+
+if (EVENT_CHECKOUT !== null) {
+  giabaoCallBackCheckout(EVENT_CHECKOUT);
+  localStorage.removeItem("TEST_DATA_TRIGGER_CHECKOUT");
+}
+
 if (window.location.href.includes("/checkouts")) {
-  gbfbq(metaPixelID, "InitiateCheckout", {});
+  console.log("checkout page");
 } else if (window.location.href.includes("/products")) {
   const productViewedData = getLocalStorageData(
     "TEST_DATA_PRODUCT_VIEWED_EVENT"
