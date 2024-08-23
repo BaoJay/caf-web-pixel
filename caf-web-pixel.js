@@ -27,80 +27,83 @@ const metaPixelID = pixelID.accountID;
   "https://connect.facebook.net/en_US/fbevents.js"
 );
 
-window.otfbq = async function () {
-  if (arguments.length > 0) {
-    let pixelID, eventName, payload, eventID, nameCustomEvent;
+window.gbfbq = async function ({
+  pixelID,
+  eventName,
+  payload,
+  eventID,
+  nameCustomEvent,
+}) {
+  if (!eventID || eventID === "") {
+    eventID = new Date().getTime();
+  }
 
-    if (typeof arguments[0] === "string") pixelID = arguments[0];
-    if (typeof arguments[1] === "string") eventName = arguments[1];
-    if (typeof arguments[2] === "object") payload = arguments[2];
-    if (arguments[3] !== undefined) eventID = arguments[3];
-    if (arguments[4] !== undefined) nameCustomEvent = arguments[4];
-
-    if (!eventID || eventID === "") {
-      eventID = new Date().getTime();
-    }
-
-    if (
-      typeof pixelID === "string" &&
-      pixelID.trim() !== "" &&
-      typeof eventName === "string" &&
-      eventName.trim() !== ""
-    ) {
-      let t = {
-        data: "testing based on otfbq",
-      };
-      payload = { ...payload, ...t };
-      console.log("otfbq is defined");
-      console.log(
-        "pixelID === ",
-        pixelID,
-        "\neventName === ",
-        eventName,
-        "\npayload === ",
-        payload,
-        "\neventID === ",
-        eventID
-      );
-      // Initialize the Facebook Pixel
-      fbq("init", pixelID, t);
-      // Use a switch statement to handle different event names
-      switch (eventName) {
-        case "PageView":
-          console.log("track page view event");
-          fbq("trackSingle", pixelID, "PageView", payload, {
-            eventID: eventID,
-          });
-          break;
-        case "ViewContent":
-        case "Search":
-        case "AddToCart":
-        case "InitiateCheckout":
-        case "AddPaymentInfo":
-        case "Lead":
-        case "CompleteRegistration":
-        case "Purchase":
-        case "AddToWishlist":
-          console.log("track standard events");
-          fbq("trackSingle", pixelID, eventName, payload, {
-            eventID: eventID,
-          });
-          break;
-        case "trackCustom":
-          fbq("trackSingle", pixelID, nameCustomEvent, payload, {
-            eventID: eventID,
-          });
-          break;
-        default:
-          return;
-      }
+  if (
+    typeof pixelID === "string" &&
+    pixelID.trim() !== "" &&
+    typeof eventName === "string" &&
+    eventName.trim() !== ""
+  ) {
+    let t = {
+      data: "testing based on gbfbq",
+    };
+    payload = { ...payload, ...t };
+    console.log("gbfbq is defined");
+    console.log(
+      "pixelID === ",
+      pixelID,
+      "\neventName === ",
+      eventName,
+      "\npayload === ",
+      payload,
+      "\neventID === ",
+      eventID
+    );
+    // Initialize the Facebook Pixel
+    fbq("init", pixelID, t);
+    // Use a switch statement to handle different event names
+    switch (eventName) {
+      case "PageView":
+        console.log("track page view event");
+        fbq("trackSingle", pixelID, "PageView", payload, {
+          eventID: eventID,
+        });
+        break;
+      case "ViewContent":
+      case "Search":
+      case "AddToCart":
+      case "InitiateCheckout":
+      case "AddPaymentInfo":
+      case "Lead":
+      case "CompleteRegistration":
+      case "Purchase":
+      case "AddToWishlist":
+        console.log("track standard events");
+        fbq("trackSingle", pixelID, eventName, payload, {
+          eventID: eventID,
+        });
+        break;
+      case "trackCustom":
+        fbq("trackSingle", pixelID, nameCustomEvent, payload, {
+          eventID: eventID,
+        });
+        break;
+      default:
+        return;
     }
   }
 };
-otfbq(metaPixelID, "PageView", {});
+gbfbq(metaPixelID, "PageView", {});
 
 if (window.location.href.includes("/checkouts")) {
-  otfbq(metaPixelID, "InitiateCheckout", {});
+  gbfbq(metaPixelID, "InitiateCheckout", {});
 } else if (window.location.href.includes("/products")) {
-  otfbq(metaPixelID, "ViewContent", {});
+  gbfbq(metaPixelID, "ViewContent", {});
+} else if (
+  window.location.href.includes("/collections") &&
+  !window.location.href.includes("/products")
+) {
+  gbfbq(metaPixelID, "CollectionView", {});
+} else if (window.location.href.includes("/cart")) {
+  gbfbq(metaPixelID, "CartView", {});
 }
