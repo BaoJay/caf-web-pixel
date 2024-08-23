@@ -35,13 +35,13 @@ console.log("metaPixelID =====", metaPixelID);
   "https://connect.facebook.net/en_US/fbevents.js"
 );
 
-window.gbfbq = async function ({
+window.gbfbq = async function (
   pixelID,
   eventName,
   payload,
   eventID,
-  nameCustomEvent,
-}) {
+  nameCustomEvent
+) {
   if (!eventID || eventID === "") {
     eventID = new Date().getTime();
   }
