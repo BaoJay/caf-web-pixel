@@ -112,7 +112,10 @@ gbfbq(metaPixelID, "PageView", {});
 
 function giabaoCallBackCheckout(event) {
   console.log("giabaoCallBackCheckout === ", event);
-  gbfbq(metaPixelID, "InitiateCheckout", event.data);
+  gbfbq(metaPixelID, "InitiateCheckout", {
+    num_items: event.data.checkout.lineItems.length,
+    value: event.data.checkout.totalPrice.amount,
+  });
 }
 
 if (EVENT_CHECKOUT !== null) {
