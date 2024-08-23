@@ -112,7 +112,16 @@ gbfbq(metaPixelID, "PageView", {});
 if (window.location.href.includes("/checkouts")) {
   gbfbq(metaPixelID, "InitiateCheckout", {});
 } else if (window.location.href.includes("/products")) {
-  gbfbq(metaPixelID, "ViewContent", {});
+  const productViewedData = getLocalStorageData(
+    "TEST_DATA_PRODUCT_VIEWED_EVENT"
+  ).data;
+  gbfbq(metaPixelID, "ViewContent", {
+    content_ids: productViewedData.productVariant.product.id,
+    content_name: productViewedData.productVariant.product.title,
+    content_type: productViewedData.productVariant.product.type,
+    currency: productViewedData.productVariant.price.currencyCode,
+    value: productViewedData.productVariant.price.amount,
+  });
 } else if (
   window.location.href.includes("/collections") &&
   !window.location.href.includes("/products")
