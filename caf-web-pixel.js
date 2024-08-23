@@ -45,7 +45,7 @@ window.gbfbq = async function ({
     eventName.trim() !== ""
   ) {
     let t = {
-      data: "testing based on gbfbq",
+      data: "testing data based on gbfbq",
     };
     payload = { ...payload, ...t };
     console.log("gbfbq is defined");
@@ -64,10 +64,15 @@ window.gbfbq = async function ({
     // Use a switch statement to handle different event names
     switch (eventName) {
       case "PageView":
-        console.log("track page view event");
-        fbq("trackSingle", pixelID, "PageView", payload, {
-          eventID: eventID,
-        });
+        fbq(
+          "trackSingle",
+          pixelID,
+          "PageView",
+          {},
+          {
+            eventID: eventID,
+          }
+        );
         break;
       case "ViewContent":
       case "Search":
@@ -78,7 +83,8 @@ window.gbfbq = async function ({
       case "CompleteRegistration":
       case "Purchase":
       case "AddToWishlist":
-        console.log("track standard events");
+      case "CollectionView":
+      case "CartView":
         fbq("trackSingle", pixelID, eventName, payload, {
           eventID: eventID,
         });
