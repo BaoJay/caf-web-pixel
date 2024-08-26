@@ -60,10 +60,6 @@ window.gbfbq = async function (
     typeof eventName === "string" &&
     eventName.trim() !== ""
   ) {
-    let t = {
-      data: "testing data based on gbfbq",
-    };
-    payload = { ...payload, ...t };
     console.log(
       "pixelID === ",
       pixelID,
@@ -128,8 +124,15 @@ function convertShopifyToMetaEventName(eventName) {
 
 function triggerEvent(event, payload) {
   const metaEventName = convertShopifyToMetaEventName(event.name);
-  console.log("Trigger event:", metaEventName, "with payload: ", payload);
-  gbfbq(metaPixelID, metaEventName, payload);
+  console.log(
+    "Trigger event:",
+    metaEventName,
+    "with payload: ",
+    payload,
+    "for event: ",
+    event
+  );
+  gbfbq(metaPixelID, metaEventName, payload, event.id);
 }
 
 // =================== TRIGGER ZONE THEN REMOVE IT FROM LOCAL STORAGE ===================
@@ -156,9 +159,8 @@ if (PRODUCT_VIEWED_EVENT) {
 // COLLECTION VIEWED EVENT
 if (COLLECTION_VIEWED_EVENT) {
   triggerEvent(COLLECTION_VIEWED_EVENT, {
-    content_ids: COLLECTION_VIEWED_EVENT.data?.collection?.id,
-    content_name: COLLECTION_VIEWED_EVENT.data?.collection?.title,
-    content_type: "collection",
+    collection_id: COLLECTION_VIEWED_EVENT.data?.collection?.id,
+    collection_name: COLLECTION_VIEWED_EVENT.data?.collection?.title,
   });
   localStorage.removeItem("TEST_DATA_TRIGGER_COLLECTION_VIEWED");
 }
