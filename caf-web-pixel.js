@@ -9,7 +9,7 @@ const metaPixelID = pixelID.accountID;
 console.log("metaPixelID ===== ", metaPixelID);
 
 const OTHER_EVENT = getLocalStorageData("GB_TRIGGER_EVENT");
-console.log("other event =====", data.name, data);
+console.log("other event =====", OTHER_EVENT.name, OTHER_EVENT);
 const PAGE_VIEWED_EVENT = getLocalStorageData("GB_TRIGGER_PAGE_VIEWED");
 const PRODUCT_VIEWED_EVENT = getLocalStorageData("GB_TRIGGER_PRODUCT_VIEWED");
 const PRODUCT_ADDED_TO_CART_EVENT = getLocalStorageData(
