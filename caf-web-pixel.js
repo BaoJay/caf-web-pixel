@@ -8,10 +8,13 @@ const data = getLocalStorageData("CAF_DATA_TRIGGER_EVENT");
 // const pageViewedData = getLocalStorageData("TEST_DATA_PAGE_VIEWED_EVENT");
 const pixelID = getLocalStorageData("CAF_PIXEL_ID");
 const EVENT_CHECKOUT = getLocalStorageData("TEST_DATA_TRIGGER_CHECKOUT");
+const EVENT_CART_VIEWED = getLocalStorageData("TEST_DATA_TRIGGER_CART_VIEWED");
 
 // console.log("pageViewedData =====", pageViewedData);
 const metaPixelID = pixelID.accountID;
-console.log("metaPixelID =====", metaPixelID);
+console.log("metaPixelID ===== ", metaPixelID);
+
+console.log("window.location.href == ", window.location.href);
 
 // Step 1. Initialize the JavaScript pixel SDK (make sure to exclude HTML)
 !(function (f, b, e, v, n, t, s) {
@@ -110,17 +113,32 @@ window.gbfbq = async function (
 };
 gbfbq(metaPixelID, "PageView", {});
 
-function giabaoCallBackCheckout(event) {
-  console.log("giabaoCallBackCheckout === ", event);
+function gbCallBackCheckout(event) {
+  console.log("gbCallBackCheckout === ", event);
   gbfbq(metaPixelID, "InitiateCheckout", {
     num_items: event.data.checkout.lineItems.length,
     value: event.data.checkout.totalPrice.amount,
   });
 }
 
+function gbCallbackCartView(event) {
+  console.log("gbCallbackCartView === ", event);
+  gbfbq(metaPixelID, "CartView", {
+    num_items: event.data.cart.lines.length,
+    value: event.data.cart.totalQuantity,
+  });
+}
+
+// Trigger checkout event
 if (EVENT_CHECKOUT !== null) {
-  giabaoCallBackCheckout(EVENT_CHECKOUT);
+  gbCallBackCheckout(EVENT_CHECKOUT);
   localStorage.removeItem("TEST_DATA_TRIGGER_CHECKOUT");
+}
+
+// Trigger cart view event
+if (EVENT_CART_VIEWED !== null) {
+  gbCallbackCartView(EVENT_CART_VIEWED);
+  localStorage.removeItem("TEST_DATA_TRIGGER_CART_VIEWED");
 }
 
 if (window.location.href.includes("/checkouts")) {
@@ -143,6 +161,4 @@ if (window.location.href.includes("/checkouts")) {
   !window.location.href.includes("/products")
 ) {
   gbfbq(metaPixelID, "CollectionView", {});
-} else if (window.location.href.includes("/cart")) {
-  gbfbq(metaPixelID, "CartView", {});
 }
