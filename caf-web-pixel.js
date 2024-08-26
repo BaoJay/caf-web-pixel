@@ -138,58 +138,63 @@ if (PAGE_VIEWED_EVENT) {
 
 // PRODUCT VIEWED EVENT
 if (PRODUCT_VIEWED_EVENT) {
+  const productVariant = PRODUCT_VIEWED_EVENT.data?.productVariant;
   triggerEvent(PRODUCT_VIEWED_EVENT, {
-    content_ids: PRODUCT_VIEWED_EVENT.data?.productVariant?.product?.id,
-    content_name: PRODUCT_VIEWED_EVENT.data?.productVariant?.product?.title,
-    content_type: PRODUCT_VIEWED_EVENT.data?.productVariant?.product?.type,
-    content_vendor: PRODUCT_VIEWED_EVENT.data?.productVariant?.product?.vendor,
-    sku: PRODUCT_VIEWED_EVENT.data?.productVariant?.sku,
-    currency: PRODUCT_VIEWED_EVENT.data?.productVariant?.price?.currencyCode,
-    value: PRODUCT_VIEWED_EVENT.data?.productVariant?.price?.amount,
+    content_ids: productVariant.product?.id,
+    content_name: productVariant.product?.title,
+    content_type: productVariant.product?.type,
+    content_vendor: productVariant.product?.vendor,
+    sku: productVariant.sku,
+    currency: productVariant.price?.currencyCode,
+    value: productVariant.price?.amount,
   });
   localStorage.removeItem("GB_TRIGGER_PRODUCT_VIEWED");
 }
 
 // PRODUCT ADDED TO CART EVENT
 if (PRODUCT_ADDED_TO_CART_EVENT) {
+  const cartLine = PRODUCT_ADDED_TO_CART_EVENT.data?.cartLine;
   triggerEvent(PRODUCT_ADDED_TO_CART_EVENT, {
-    content_ids: [PRODUCT_ADDED_TO_CART_EVENT.data?.cartLine?.merchandise?.id],
+    content_ids: [cartLine.merchandise?.product?.id],
     content_name:
-      PRODUCT_ADDED_TO_CART_EVENT.data?.cartLine?.merchandise?.title,
-    content_type: PRODUCT_ADDED_TO_CART_EVENT.data?.cartLine?.merchandise?.type,
-    content_vendor:
-      PRODUCT_ADDED_TO_CART_EVENT.data?.cartLine?.merchandise?.vendor,
-    content_brand:
-      PRODUCT_ADDED_TO_CART_EVENT.data?.cartLine?.merchandise?.brand,
-    content_category:
-      PRODUCT_ADDED_TO_CART_EVENT.data?.cartLine?.merchandise?.category,
+      cartLine.merchandise?.product?.title ||
+      cartLine.merchandise?.product?.untranslatedTitle,
+    content_type: cartLine.merchandise?.product?.type,
+    content_vendor: cartLine.merchandise?.product?.vendor,
+    sku: cartLine.merchandise?.sku,
+    currency: cartLine.merchandise?.price?.currencyCode,
+    value: cartLine.merchandise?.price?.amount,
+    quantity: cartLine.quantity,
   });
   localStorage.removeItem("GB_TRIGGER_PRODUCT_ADDED_TO_CART");
 }
 
 // COLLECTION VIEWED EVENT
 if (COLLECTION_VIEWED_EVENT) {
+  const collection = COLLECTION_VIEWED_EVENT.data?.collection;
   triggerEvent(COLLECTION_VIEWED_EVENT, {
-    collection_id: COLLECTION_VIEWED_EVENT.data?.collection?.id,
-    collection_name: COLLECTION_VIEWED_EVENT.data?.collection?.title,
+    collection_id: collection.id,
+    collection_name: collection.title,
   });
   localStorage.removeItem("GB_TRIGGER_COLLECTION_VIEWED");
 }
 
 // CART VIEWED EVENT
 if (CART_VIEWED_EVENT) {
+  const cart = CART_VIEWED_EVENT.data?.cart;
   triggerEvent(CART_VIEWED_EVENT, {
-    num_items: CART_VIEWED_EVENT.data?.cart?.lines?.length,
-    value: CART_VIEWED_EVENT.data?.cart?.totalQuantity,
+    num_items: cart.lines?.length,
+    value: cart.totalQuantity,
   });
   localStorage.removeItem("GB_TRIGGER_CART_VIEWED");
 }
 
 // CHECKOUT STARTED EVENT
 if (CHECKOUT_STARTED_EVENT) {
+  const checkout = CHECKOUT_STARTED_EVENT.data?.checkout;
   triggerEvent(CHECKOUT_STARTED_EVENT, {
-    num_items: CHECKOUT_STARTED_EVENT.data?.checkout?.lineItems?.length,
-    value: CHECKOUT_STARTED_EVENT.data?.checkout?.totalPrice?.amount,
+    num_items: checkout.lineItems?.length,
+    value: checkout.totalPrice?.amount,
   });
   localStorage.removeItem("GB_TRIGGER_CHECKOUT");
 }
