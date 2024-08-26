@@ -1,3 +1,4 @@
+// Return false or data
 function getLocalStorageData(key) {
   return (
     localStorage.getItem(key) !== null && JSON.parse(localStorage.getItem(key))
@@ -126,7 +127,7 @@ function gbCallbackCartView(event) {
 }
 
 // Trigger checkout event
-if (EVENT_CHECKOUT !== null) {
+if (!EVENT_CHECKOUT) {
   console.log("gbCallBackCheckout === ", EVENT_CHECKOUT);
   gbfbq(metaPixelID, "InitiateCheckout", {
     num_items: EVENT_CHECKOUT.data?.checkout?.lineItems?.length,
@@ -136,7 +137,7 @@ if (EVENT_CHECKOUT !== null) {
 }
 
 // Trigger cart view event
-if (EVENT_CART_VIEWED !== null) {
+if (!EVENT_CART_VIEWED) {
   gbCallbackCartView(EVENT_CART_VIEWED);
   localStorage.removeItem("TEST_DATA_TRIGGER_CART_VIEWED");
 }
