@@ -5,6 +5,8 @@ function getLocalStorageData(key) {
   );
 }
 const pixelID = getLocalStorageData("CAF_PIXEL_ID");
+const metaPixelID = pixelID.accountID;
+console.log("metaPixelID ===== ", metaPixelID);
 
 const data = getLocalStorageData("CAF_DATA_TRIGGER_EVENT");
 const PAGE_VIEWED_EVENT = getLocalStorageData("TEST_DATA_TRIGGER_PAGE_VIEWED");
@@ -16,9 +18,6 @@ const COLLECTION_VIEWED_EVENT = getLocalStorageData(
 );
 const CART_VIEWED_EVENT = getLocalStorageData("TEST_DATA_TRIGGER_CART_VIEWED");
 const CHECKOUT_EVENT = getLocalStorageData("TEST_DATA_TRIGGER_CHECKOUT");
-
-const metaPixelID = pixelID.accountID;
-console.log("metaPixelID ===== ", metaPixelID);
 
 // Step 1. Initialize the JavaScript pixel SDK (make sure to exclude HTML)
 !(function (f, b, e, v, n, t, s) {
@@ -71,19 +70,11 @@ window.gbfbq = async function (
       eventID
     );
     // Initialize the Facebook Pixel
-    fbq("init", pixelID, t);
+    fbq("init", pixelID, eventID);
     // Use a switch statement to handle different event names
     switch (eventName) {
       case "PageView":
-        fbq(
-          "trackSingle",
-          pixelID,
-          "PageView",
-          {},
-          {
-            eventID: eventID,
-          }
-        );
+        fbq("trackSingle", pixelID, "PageView", {}, { eventID });
         break;
       case "ViewContent":
       case "Search":
@@ -96,14 +87,10 @@ window.gbfbq = async function (
       case "AddToWishlist":
       case "CollectionView":
       case "CartView":
-        fbq("trackSingle", pixelID, eventName, payload, {
-          eventID: eventID,
-        });
+        fbq("trackSingle", pixelID, eventName, payload, { eventID });
         break;
       case "trackCustom":
-        fbq("trackSingle", pixelID, nameCustomEvent, payload, {
-          eventID: eventID,
-        });
+        fbq("trackSingle", pixelID, nameCustomEvent, payload, { eventID });
         break;
       default:
         return;
