@@ -116,16 +116,16 @@ gbfbq(metaPixelID, "PageView", {});
 function gbCallBackCheckout(event) {
   console.log("gbCallBackCheckout === ", event);
   gbfbq(metaPixelID, "InitiateCheckout", {
-    num_items: event.data.checkout.lineItems.length,
-    value: event.data.checkout.totalPrice.amount,
+    num_items: event.data?.checkout?.lineItems?.length,
+    value: event.data?.checkout?.totalPrice?.amount,
   });
 }
 
 function gbCallbackCartView(event) {
   console.log("gbCallbackCartView === ", event);
   gbfbq(metaPixelID, "CartView", {
-    num_items: event.data.cart.lines.length,
-    value: event.data.cart.totalQuantity,
+    num_items: event.data?.cart?.lines?.length,
+    value: event.data?.cart?.totalQuantity,
   });
 }
 
@@ -150,11 +150,11 @@ if (window.location.href.includes("/checkouts")) {
   ).data;
   console.log("productViewedData =====", productViewedData);
   gbfbq(metaPixelID, "ViewContent", {
-    content_ids: productViewedData.productVariant.product.id,
-    content_name: productViewedData.productVariant.product.title,
-    content_type: productViewedData.productVariant.product.type,
-    currency: productViewedData.productVariant.price.currencyCode,
-    value: productViewedData.productVariant.price.amount,
+    content_ids: productViewedData.productVariant?.product?.id,
+    content_name: productViewedData.productVariant?.product?.title,
+    content_type: productViewedData.productVariant?.product?.type,
+    currency: productViewedData.productVariant?.price?.currencyCode,
+    value: productViewedData.productVariant?.price?.amount,
   });
 } else if (
   window.location.href.includes("/collections") &&
