@@ -113,13 +113,9 @@ window.gbfbq = async function (
 };
 gbfbq(metaPixelID, "PageView", {});
 
-function gbCallBackCheckout(event) {
-  console.log("gbCallBackCheckout === ", event);
-  gbfbq(metaPixelID, "InitiateCheckout", {
-    num_items: event.data?.checkout?.lineItems?.length,
-    value: event.data?.checkout?.totalPrice?.amount,
-  });
-}
+// function gbCallBackCheckout(event) {
+
+// }
 
 function gbCallbackCartView(event) {
   console.log("gbCallbackCartView === ", event);
@@ -131,7 +127,11 @@ function gbCallbackCartView(event) {
 
 // Trigger checkout event
 if (EVENT_CHECKOUT !== null) {
-  gbCallBackCheckout(EVENT_CHECKOUT);
+  console.log("gbCallBackCheckout === ", EVENT_CHECKOUT);
+  gbfbq(metaPixelID, "InitiateCheckout", {
+    num_items: EVENT_CHECKOUT.data?.checkout?.lineItems?.length,
+    value: EVENT_CHECKOUT.data?.checkout?.totalPrice?.amount,
+  });
   localStorage.removeItem("TEST_DATA_TRIGGER_CHECKOUT");
 }
 
