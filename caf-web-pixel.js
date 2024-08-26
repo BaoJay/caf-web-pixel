@@ -5,11 +5,11 @@ function getLocalStorageData(key) {
 }
 
 const data = getLocalStorageData("CAF_DATA_TRIGGER_EVENT");
-const pageViewedData = getLocalStorageData("TEST_DATA_PAGE_VIEWED_EVENT");
+// const pageViewedData = getLocalStorageData("TEST_DATA_PAGE_VIEWED_EVENT");
 const pixelID = getLocalStorageData("CAF_PIXEL_ID");
 const EVENT_CHECKOUT = getLocalStorageData("TEST_DATA_TRIGGER_CHECKOUT");
 
-console.log("pageViewedData =====", pageViewedData);
+// console.log("pageViewedData =====", pageViewedData);
 const metaPixelID = pixelID.accountID;
 console.log("metaPixelID =====", metaPixelID);
 
@@ -126,9 +126,11 @@ if (EVENT_CHECKOUT !== null) {
 if (window.location.href.includes("/checkouts")) {
   console.log("checkout page");
 } else if (window.location.href.includes("/products")) {
+  console.log("===== render in product page =====");
   const productViewedData = getLocalStorageData(
     "TEST_DATA_PRODUCT_VIEWED_EVENT"
   ).data;
+  console.log("productViewedData =====", productViewedData);
   gbfbq(metaPixelID, "ViewContent", {
     content_ids: productViewedData.productVariant.product.id,
     content_name: productViewedData.productVariant.product.title,
