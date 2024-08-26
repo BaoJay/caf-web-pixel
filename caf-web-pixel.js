@@ -4,18 +4,21 @@ function getLocalStorageData(key) {
     localStorage.getItem(key) !== null && JSON.parse(localStorage.getItem(key))
   );
 }
+const pixelID = getLocalStorageData("CAF_PIXEL_ID");
 
 const data = getLocalStorageData("CAF_DATA_TRIGGER_EVENT");
-// const pageViewedData = getLocalStorageData("TEST_DATA_PAGE_VIEWED_EVENT");
-const pixelID = getLocalStorageData("CAF_PIXEL_ID");
-const CHECKOUT_EVENT = getLocalStorageData("TEST_DATA_TRIGGER_CHECKOUT");
+const PAGE_VIEWED_EVENT = getLocalStorageData("TEST_DATA_TRIGGER_PAGE_VIEWED");
+const PRODUCT_VIEWED_EVENT = getLocalStorageData(
+  "TEST_DATA_TRIGGER_PRODUCT_VIEWED"
+);
+const COLLECTION_VIEWED_EVENT = getLocalStorageData(
+  "TEST_DATA_TRIGGER_COLLECTION_VIEWED"
+);
 const CART_VIEWED_EVENT = getLocalStorageData("TEST_DATA_TRIGGER_CART_VIEWED");
+const CHECKOUT_EVENT = getLocalStorageData("TEST_DATA_TRIGGER_CHECKOUT");
 
-// console.log("pageViewedData =====", pageViewedData);
 const metaPixelID = pixelID.accountID;
 console.log("metaPixelID ===== ", metaPixelID);
-
-console.log("window.location.href == ", window.location.href);
 
 // Step 1. Initialize the JavaScript pixel SDK (make sure to exclude HTML)
 !(function (f, b, e, v, n, t, s) {
@@ -61,7 +64,6 @@ window.gbfbq = async function (
       data: "testing data based on gbfbq",
     };
     payload = { ...payload, ...t };
-    console.log("gbfbq is defined");
     console.log(
       "pixelID === ",
       pixelID,
@@ -112,11 +114,12 @@ window.gbfbq = async function (
     }
   }
 };
-gbfbq(metaPixelID, "PageView", {});
 
 function convertShopifyToMetaEventName(eventName) {
   if (eventName === "page_viewed") return "PageView";
   if (eventName === "product_viewed") return "ViewContent";
+  if (eventName === "collection_viewed") return "CollectionView";
+  if (eventName === "cart_viewed") return "CartView";
   if (eventName === "product_added_to_cart") return "AddToCart";
   if (eventName === "checkout_started") return "InitiateCheckout";
   if (eventName === "checkout_completed") return "Purchase";
@@ -125,19 +128,42 @@ function convertShopifyToMetaEventName(eventName) {
 
 function triggerEvent(event, payload) {
   const metaEventName = convertShopifyToMetaEventName(event.name);
-  console.log("Trigger event: ", metaEventName, " with payload: ", payload);
+  console.log("Trigger event:", metaEventName, "with payload: ", payload);
   gbfbq(metaPixelID, metaEventName, payload);
 }
 
-function gbCallBackCheckout(event) {
-  console.log("Checkout event === ", event);
-  gbfbq(metaPixelID, "InitiateCheckout", {
-    num_items: event.data?.checkout?.lineItems?.length,
-    value: event.data?.checkout?.totalPrice?.amount,
-  });
+// =================== TRIGGER ZONE THEN REMOVE IT FROM LOCAL STORAGE ===================
+// PAGE VIEWED EVENT
+if (PAGE_VIEWED_EVENT) {
+  triggerEvent(PAGE_VIEWED_EVENT, {});
+  localStorage.removeItem("TEST_DATA_TRIGGER_PAGE_VIEWED");
 }
 
-// Trigger cart view event then remove it from local storage
+// PRODUCT VIEWED EVENT
+if (PRODUCT_VIEWED_EVENT) {
+  triggerEvent(PRODUCT_VIEWED_EVENT, {
+    content_ids: PRODUCT_VIEWED_EVENT.data?.productVariant?.product?.id,
+    content_name: PRODUCT_VIEWED_EVENT.data?.productVariant?.product?.title,
+    content_type: PRODUCT_VIEWED_EVENT.data?.productVariant?.product?.type,
+    content_vendor: PRODUCT_VIEWED_EVENT.data?.productVariant?.product?.vendor,
+    sku: PRODUCT_VIEWED_EVENT.data?.productVariant?.sku,
+    currency: PRODUCT_VIEWED_EVENT.data?.productVariant?.price?.currencyCode,
+    value: PRODUCT_VIEWED_EVENT.data?.productVariant?.price?.amount,
+  });
+  localStorage.removeItem("TEST_DATA_TRIGGER_PRODUCT_VIEWED");
+}
+
+// COLLECTION VIEWED EVENT
+if (COLLECTION_VIEWED_EVENT) {
+  triggerEvent(COLLECTION_VIEWED_EVENT, {
+    content_ids: COLLECTION_VIEWED_EVENT.data?.collection?.id,
+    content_name: COLLECTION_VIEWED_EVENT.data?.collection?.title,
+    content_type: "collection",
+  });
+  localStorage.removeItem("TEST_DATA_TRIGGER_COLLECTION_VIEWED");
+}
+
+// CART VIEWED EVENT
 if (CART_VIEWED_EVENT) {
   triggerEvent(CART_VIEWED_EVENT, {
     num_items: CART_VIEWED_EVENT.data?.cart?.lines?.length,
@@ -146,30 +172,11 @@ if (CART_VIEWED_EVENT) {
   localStorage.removeItem("TEST_DATA_TRIGGER_CART_VIEWED");
 }
 
-// Trigger checkout event then remove it from local storage
+// CHECKOUT EVENT
 if (CHECKOUT_EVENT) {
-  gbCallBackCheckout(CHECKOUT_EVENT);
-  localStorage.removeItem("TEST_DATA_TRIGGER_CHECKOUT");
-}
-
-if (window.location.href.includes("/products")) {
-  console.log("===== render in product page =====");
-  const productViewedData = getLocalStorageData(
-    "TEST_DATA_PRODUCT_VIEWED_EVENT"
-  ).data;
-  console.log("productViewedData =====", productViewedData);
-  gbfbq(metaPixelID, "ViewContent", {
-    content_ids: productViewedData.productVariant?.product?.id,
-    content_name: productViewedData.productVariant?.product?.title,
-    content_type: productViewedData.productVariant?.product?.type,
-    content_vendor: productViewedData.productVariant?.product?.vendor,
-    sku: productViewedData.productVariant?.sku,
-    currency: productViewedData.productVariant?.price?.currencyCode,
-    value: productViewedData.productVariant?.price?.amount,
+  triggerEvent(CHECKOUT_EVENT, {
+    num_items: CHECKOUT_EVENT.data?.checkout?.lineItems?.length,
+    value: CHECKOUT_EVENT.data?.checkout?.totalPrice?.amount,
   });
-} else if (
-  window.location.href.includes("/collections") &&
-  !window.location.href.includes("/products")
-) {
-  gbfbq(metaPixelID, "CollectionView", {});
+  localStorage.removeItem("TEST_DATA_TRIGGER_CHECKOUT");
 }
