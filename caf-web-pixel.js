@@ -151,6 +151,21 @@ if (PRODUCT_VIEWED_EVENT) {
 }
 
 // PRODUCT ADDED TO CART EVENT
+if (PRODUCT_ADDED_TO_CART_EVENT) {
+  triggerEvent(PRODUCT_ADDED_TO_CART_EVENT, {
+    content_ids: [PRODUCT_ADDED_TO_CART_EVENT.data?.cartLine?.merchandise?.id],
+    content_name:
+      PRODUCT_ADDED_TO_CART_EVENT.data?.cartLine?.merchandise?.title,
+    content_type: PRODUCT_ADDED_TO_CART_EVENT.data?.cartLine?.merchandise?.type,
+    content_vendor:
+      PRODUCT_ADDED_TO_CART_EVENT.data?.cartLine?.merchandise?.vendor,
+    content_brand:
+      PRODUCT_ADDED_TO_CART_EVENT.data?.cartLine?.merchandise?.brand,
+    content_category:
+      PRODUCT_ADDED_TO_CART_EVENT.data?.cartLine?.merchandise?.category,
+  });
+  localStorage.removeItem("GB_TRIGGER_PRODUCT_ADDED_TO_CART");
+}
 
 // COLLECTION VIEWED EVENT
 if (COLLECTION_VIEWED_EVENT) {
@@ -180,3 +195,24 @@ if (CHECKOUT_STARTED_EVENT) {
 }
 
 // CHECKOUT COMPLETED EVENT
+if (CHECKOUT_COMPLETED_EVENT) {
+  const checkout = CHECKOUT_COMPLETED_EVENT.data?.checkout;
+  const checkoutTotalPrice = checkout.totalPrice?.amount;
+  const allDiscountCodes = checkout.discountApplications?.map((discount) => {
+    if (discount.type === "DISCOUNT_CODE") {
+      return discount.title;
+    }
+  });
+  const paymentTransactions = checkout.transactions?.map((transaction) => {
+    return {
+      paymentGateway: transaction.gateway,
+      amount: transaction.amount,
+    };
+  });
+  triggerEvent(CHECKOUT_COMPLETED_EVENT, {
+    totalPrice: checkoutTotalPrice,
+    discountCodesUsed: allDiscountCodes,
+    paymentTransactions: paymentTransactions,
+  });
+  localStorage.removeItem("GB_TRIGGER_CHECKOUT_COMPLETED");
+}
