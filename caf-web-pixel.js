@@ -127,7 +127,7 @@ function gbCallbackCartView(event) {
 }
 
 // Trigger checkout event
-if (!EVENT_CHECKOUT) {
+if (EVENT_CHECKOUT) {
   console.log("gbCallBackCheckout === ", EVENT_CHECKOUT);
   gbfbq(metaPixelID, "InitiateCheckout", {
     num_items: EVENT_CHECKOUT.data?.checkout?.lineItems?.length,
@@ -137,7 +137,7 @@ if (!EVENT_CHECKOUT) {
 }
 
 // Trigger cart view event
-if (!EVENT_CART_VIEWED) {
+if (EVENT_CART_VIEWED) {
   gbCallbackCartView(EVENT_CART_VIEWED);
   localStorage.removeItem("TEST_DATA_TRIGGER_CART_VIEWED");
 }
