@@ -8,16 +8,23 @@ const pixelID = getLocalStorageData("CAF_PIXEL_ID");
 const metaPixelID = pixelID.accountID;
 console.log("metaPixelID ===== ", metaPixelID);
 
-const data = getLocalStorageData("CAF_DATA_TRIGGER_EVENT");
-const PAGE_VIEWED_EVENT = getLocalStorageData("TEST_DATA_TRIGGER_PAGE_VIEWED");
-const PRODUCT_VIEWED_EVENT = getLocalStorageData(
-  "TEST_DATA_TRIGGER_PRODUCT_VIEWED"
+const OTHER_EVENT = getLocalStorageData("GB_TRIGGER_EVENT");
+console.log("other event =====", data.name, data);
+const PAGE_VIEWED_EVENT = getLocalStorageData("GB_TRIGGER_PAGE_VIEWED");
+const PRODUCT_VIEWED_EVENT = getLocalStorageData("GB_TRIGGER_PRODUCT_VIEWED");
+const PRODUCT_ADDED_TO_CART_EVENT = getLocalStorageData(
+  "GB_TRIGGER_PRODUCT_ADDED_TO_CART"
 );
 const COLLECTION_VIEWED_EVENT = getLocalStorageData(
-  "TEST_DATA_TRIGGER_COLLECTION_VIEWED"
+  "GB_TRIGGER_COLLECTION_VIEWED"
 );
-const CART_VIEWED_EVENT = getLocalStorageData("TEST_DATA_TRIGGER_CART_VIEWED");
-const CHECKOUT_EVENT = getLocalStorageData("TEST_DATA_TRIGGER_CHECKOUT");
+const CART_VIEWED_EVENT = getLocalStorageData("GB_TRIGGER_CART_VIEWED");
+const CHECKOUT_STARTED_EVENT = getLocalStorageData(
+  "GB_TRIGGER_CHECKOUT_STARTED"
+);
+const CHECKOUT_COMPLETED_EVENT = getLocalStorageData(
+  "GB_TRIGGER_CHECKOUT_COMPLETED"
+);
 
 // Step 1. Initialize the JavaScript pixel SDK (make sure to exclude HTML)
 !(function (f, b, e, v, n, t, s) {
@@ -126,7 +133,7 @@ function triggerEvent(event, payload) {
 // PAGE VIEWED EVENT
 if (PAGE_VIEWED_EVENT) {
   triggerEvent(PAGE_VIEWED_EVENT, {});
-  localStorage.removeItem("TEST_DATA_TRIGGER_PAGE_VIEWED");
+  localStorage.removeItem("GB_TRIGGER_PAGE_VIEWED");
 }
 
 // PRODUCT VIEWED EVENT
@@ -140,8 +147,10 @@ if (PRODUCT_VIEWED_EVENT) {
     currency: PRODUCT_VIEWED_EVENT.data?.productVariant?.price?.currencyCode,
     value: PRODUCT_VIEWED_EVENT.data?.productVariant?.price?.amount,
   });
-  localStorage.removeItem("TEST_DATA_TRIGGER_PRODUCT_VIEWED");
+  localStorage.removeItem("GB_TRIGGER_PRODUCT_VIEWED");
 }
+
+// PRODUCT ADDED TO CART EVENT
 
 // COLLECTION VIEWED EVENT
 if (COLLECTION_VIEWED_EVENT) {
@@ -149,7 +158,7 @@ if (COLLECTION_VIEWED_EVENT) {
     collection_id: COLLECTION_VIEWED_EVENT.data?.collection?.id,
     collection_name: COLLECTION_VIEWED_EVENT.data?.collection?.title,
   });
-  localStorage.removeItem("TEST_DATA_TRIGGER_COLLECTION_VIEWED");
+  localStorage.removeItem("GB_TRIGGER_COLLECTION_VIEWED");
 }
 
 // CART VIEWED EVENT
@@ -158,14 +167,16 @@ if (CART_VIEWED_EVENT) {
     num_items: CART_VIEWED_EVENT.data?.cart?.lines?.length,
     value: CART_VIEWED_EVENT.data?.cart?.totalQuantity,
   });
-  localStorage.removeItem("TEST_DATA_TRIGGER_CART_VIEWED");
+  localStorage.removeItem("GB_TRIGGER_CART_VIEWED");
 }
 
-// CHECKOUT EVENT
-if (CHECKOUT_EVENT) {
-  triggerEvent(CHECKOUT_EVENT, {
-    num_items: CHECKOUT_EVENT.data?.checkout?.lineItems?.length,
-    value: CHECKOUT_EVENT.data?.checkout?.totalPrice?.amount,
+// CHECKOUT STARTED EVENT
+if (CHECKOUT_STARTED_EVENT) {
+  triggerEvent(CHECKOUT_STARTED_EVENT, {
+    num_items: CHECKOUT_STARTED_EVENT.data?.checkout?.lineItems?.length,
+    value: CHECKOUT_STARTED_EVENT.data?.checkout?.totalPrice?.amount,
   });
-  localStorage.removeItem("TEST_DATA_TRIGGER_CHECKOUT");
+  localStorage.removeItem("GB_TRIGGER_CHECKOUT");
 }
+
+// CHECKOUT COMPLETED EVENT
