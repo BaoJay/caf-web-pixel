@@ -81,7 +81,7 @@ window.gbfbq = async function (
     // Use a switch statement to handle different event names
     switch (eventName) {
       case "PageView":
-        fbq("trackSingle", pixelID, "PageView", {}, { eventID });
+        fbq("track", pixelID, "PageView", {}, { eventID });
         break;
       case "ViewContent":
       case "Search":
