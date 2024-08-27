@@ -1,29 +1,10 @@
-// Function to handle the received message
-function handleMessage(event) {
-  // Ensure the message is from a trusted source
-  if (event.origin !== "http://your-trusted-origin.com") {
-    return;
-  }
-
-  console.log("Message received:", event.data);
-
-  const message = event.data;
-  if (message.event === "customEvent") {
-    // Trigger a custom event
-    const customEvent = new CustomEvent("customEvent", {
-      detail: message.data,
-    });
-    window.dispatchEvent(customEvent);
-  }
+// Function to handle the custom event
+function handleCustomEvent(event) {
+  console.log("Custom event received in Script 2:", event.detail);
 }
 
-// Add an event listener for the message event
-window.addEventListener("message", handleMessage);
-
 // Add an event listener for the custom event
-window.addEventListener("customEvent", function (e) {
-  console.log("Custom event triggered with data:", e.detail);
-});
+window.addEventListener("customEvent", handleCustomEvent, false);
 
 // Return false or data
 function getLocalStorageData(key) {
