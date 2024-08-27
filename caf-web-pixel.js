@@ -25,6 +25,7 @@ const CHECKOUT_STARTED_EVENT = getLocalStorageData(
 const CHECKOUT_COMPLETED_EVENT = getLocalStorageData(
   "GB_TRIGGER_CHECKOUT_COMPLETED"
 );
+const GB_TRIGGER_SEARCH_EVENT = getLocalStorageData("GB_TRIGGER_SEARCH");
 
 // Step 1. Initialize the JavaScript pixel SDK (make sure to exclude HTML)
 !(function (f, b, e, v, n, t, s) {
@@ -224,6 +225,16 @@ if (CHECKOUT_COMPLETED_EVENT) {
   localStorage.removeItem("GB_TRIGGER_CHECKOUT_COMPLETED");
 }
 
+// SEARCH EVENT
+if (GB_TRIGGER_SEARCH_EVENT) {
+  const searchResult = GB_TRIGGER_SEARCH_EVENT.data.searchResult;
+  triggerEvent(GB_TRIGGER_SEARCH_EVENT, {
+    search_query: searchResult.query,
+    first_product_title: searchResult.productVariants[0]?.product.title,
+  });
+  localStorage.removeItem("GB_TRIGGER_SEARCH");
+}
+
 const style =
   "background-color: darkblue; color: white; font-style: italic; border-radius: 5px; padding: 5px; font-size: 1em;";
 
@@ -249,17 +260,6 @@ function handleCustomEvent(customEvent) {
       currency: cartLine.merchandise?.price?.currencyCode,
       value: cartLine.merchandise?.price?.amount,
       quantity: cartLine.quantity,
-    });
-  } else if (event.name === "search_submitted") {
-    console.log(
-      "%search_submitted is trigger in BaoJay. Muahahahahahaha",
-      style
-    );
-
-    triggerEvent(event, {
-      search_query: event.data.searchResult.query,
-      first_product_title:
-        event.data.searchResult.productVariants[0]?.product.title,
     });
   } else if (event.name === "payment_info_submitted") {
     console.log(
