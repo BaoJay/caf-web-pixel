@@ -222,26 +222,32 @@ if (CHECKOUT_COMPLETED_EVENT) {
   localStorage.removeItem("GB_TRIGGER_CHECKOUT_COMPLETED");
 }
 
+const style =
+  "background-color: darkblue; color: white; font-style: italic; border-radius: 5px; padding: 5px; font-size: 1em;";
+
 // Function to handle the custom event
 function handleCustomEvent(customEvent) {
   console.log("Handle customEvent in BaoJay: ", customEvent.detail);
   if (customEvent.detail.name === "product_added_to_cart") {
-    console.log("product_added_to_cart is trigger in BaoJay. Muahahahahahaha");
+    console.log(
+      "%cproduct_added_to_cart is trigger in BaoJay. Muahahahahahaha",
+      style
+    );
+    const addToCartEvent = customEvent.detail;
+    const cartLine = addToCartEvent.data?.cartLine;
+    triggerEvent(addToCartEvent, {
+      content_ids: [cartLine.merchandise?.product?.id],
+      content_name:
+        cartLine.merchandise?.product?.title ||
+        cartLine.merchandise?.product?.untranslatedTitle,
+      content_type: cartLine.merchandise?.product?.type,
+      content_vendor: cartLine.merchandise?.product?.vendor,
+      sku: cartLine.merchandise?.sku,
+      currency: cartLine.merchandise?.price?.currencyCode,
+      value: cartLine.merchandise?.price?.amount,
+      quantity: cartLine.quantity,
+    });
   }
-  // customEvent.detail = PRODUCT_ADDED_TO_CART_EVENT
-  //  const cartLine = PRODUCT_ADDED_TO_CART_EVENT.data?.cartLine;
-  // triggerEvent(PRODUCT_ADDED_TO_CART_EVENT, {
-  //   content_ids: [cartLine.merchandise?.product?.id],
-  //   content_name:
-  //     cartLine.merchandise?.product?.title ||
-  //     cartLine.merchandise?.product?.untranslatedTitle,
-  //   content_type: cartLine.merchandise?.product?.type,
-  //   content_vendor: cartLine.merchandise?.product?.vendor,
-  //   sku: cartLine.merchandise?.sku,
-  //   currency: cartLine.merchandise?.price?.currencyCode,
-  //   value: cartLine.merchandise?.price?.amount,
-  //   quantity: cartLine.quantity,
-  // });
 }
 
 // Add an event listener for the custom event
