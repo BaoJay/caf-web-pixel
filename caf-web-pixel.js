@@ -223,8 +223,12 @@ if (CHECKOUT_COMPLETED_EVENT) {
 }
 
 // Function to handle the custom event
-function handleCustomEvent(event) {
-  console.log("Custom event received in Script 2:", event);
+function handleCustomEvent(customEvent) {
+  console.log("Handle customEvent in BaoJay: ", customEvent.detail);
+  if (customEvent.detail.name === "product_added_to_cart") {
+    console.log("product_added_to_cart is trigger in BaoJay. Muahahahahahaha");
+  }
+  // customEvent.detail = PRODUCT_ADDED_TO_CART_EVENT
   //  const cartLine = PRODUCT_ADDED_TO_CART_EVENT.data?.cartLine;
   // triggerEvent(PRODUCT_ADDED_TO_CART_EVENT, {
   //   content_ids: [cartLine.merchandise?.product?.id],
