@@ -150,7 +150,6 @@ if (PRODUCT_VIEWED_EVENT && window.location.href.includes("/product")) {
     sku: productVariant.sku,
     currency: productVariant.price?.currencyCode,
     value: productVariant.price?.amount,
-    contents,
   });
   localStorage.removeItem("GB_TRIGGER_PRODUCT_VIEWED");
 }
