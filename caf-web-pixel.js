@@ -229,6 +229,8 @@ function handleMessage(event) {
     return;
   }
 
+  console.log("Message received:", event.data);
+
   const message = event.data;
   if (message.event === "customEvent") {
     // Trigger a custom event
