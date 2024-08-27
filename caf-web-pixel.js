@@ -66,16 +66,16 @@ window.gbfbq = async function (
     typeof eventName === "string" &&
     eventName.trim() !== ""
   ) {
-    console.log(
-      "pixelID === ",
-      pixelID,
-      "\neventName === ",
-      eventName,
-      "\npayload === ",
-      payload,
-      "\neventID === ",
-      eventID
-    );
+    // console.log(
+    //   "pixelID === ",
+    //   pixelID,
+    //   "\neventName === ",
+    //   eventName,
+    //   "\npayload === ",
+    //   payload,
+    //   "\neventID === ",
+    //   eventID
+    // );
     // Initialize the Facebook Pixel
     fbq("init", pixelID, eventID);
     // Use a switch statement to handle different event names
@@ -221,3 +221,28 @@ if (CHECKOUT_COMPLETED_EVENT) {
   });
   localStorage.removeItem("GB_TRIGGER_CHECKOUT_COMPLETED");
 }
+
+// Function to handle the received message
+function handleMessage(event) {
+  // Ensure the message is from a trusted source
+  if (event.origin !== "http://your-trusted-origin.com") {
+    return;
+  }
+
+  const message = event.data;
+  if (message.event === "customEvent") {
+    // Trigger a custom event
+    const customEvent = new CustomEvent("customEvent", {
+      detail: message.data,
+    });
+    window.dispatchEvent(customEvent);
+  }
+}
+
+// Add an event listener for the message event
+window.addEventListener("message", handleMessage, false);
+
+// Add an event listener for the custom event
+window.addEventListener("customEvent", function (e) {
+  console.log("Custom event triggered with data:", e.detail);
+});
