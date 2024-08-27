@@ -108,11 +108,13 @@ window.gbfbq = async function (
 function convertShopifyToMetaEventName(eventName) {
   if (eventName === "page_viewed") return "PageView";
   if (eventName === "product_viewed") return "ViewContent";
-  if (eventName === "collection_viewed") return "CollectionView";
-  if (eventName === "cart_viewed") return "CartView";
+  if (eventName === "collection_viewed") return "CollectionView"; // Custom event
+  if (eventName === "cart_viewed") return "CartView"; // Custom event
   if (eventName === "product_added_to_cart") return "AddToCart";
   if (eventName === "checkout_started") return "InitiateCheckout";
   if (eventName === "checkout_completed") return "Purchase";
+  if (eventName === "payment_info_submitted") return "AddPaymentInfo";
+  if (eventName === "search_submitted") return "Search";
   return eventName;
 }
 
@@ -228,14 +230,15 @@ const style =
 // Function to handle the custom event
 function handleCustomEvent(customEvent) {
   console.log("Handle customEvent in BaoJay: ", customEvent.detail);
-  if (customEvent.detail.name === "product_added_to_cart") {
+  const event = customEvent.detail;
+  if (event.name === "product_added_to_cart") {
     console.log(
       "%cproduct_added_to_cart is trigger in BaoJay. Muahahahahahaha",
       style
     );
-    const addToCartEvent = customEvent.detail;
-    const cartLine = addToCartEvent.data?.cartLine;
-    triggerEvent(addToCartEvent, {
+    const cartLine = event.data?.cartLine;
+
+    triggerEvent(event, {
       content_ids: [cartLine.merchandise?.product?.id],
       content_name:
         cartLine.merchandise?.product?.title ||
@@ -246,6 +249,34 @@ function handleCustomEvent(customEvent) {
       currency: cartLine.merchandise?.price?.currencyCode,
       value: cartLine.merchandise?.price?.amount,
       quantity: cartLine.quantity,
+    });
+  } else if (event.name === "search_submitted") {
+    console.log(
+      "%search_submitted is trigger in BaoJay. Muahahahahahaha",
+      style
+    );
+
+    triggerEvent(event, {
+      search_query: event.data.searchResult.query,
+      first_product_title:
+        event.data.searchResult.productVariants[0]?.product.title,
+    });
+  } else if (event.name === "payment_info_submitted") {
+    console.log(
+      "%cpayment_info_submitted is trigger in BaoJay. Muahahahahahaha",
+      style
+    );
+    const checkout = event.data.checkout;
+    const checkoutTotalPrice = checkout.totalPrice?.amount;
+    const firstDiscountType = checkout.discountApplications[0]?.type;
+    const discountCode =
+      firstDiscountType === "DISCOUNT_CODE"
+        ? checkout.discountApplications[0]?.title
+        : null;
+
+    triggerEvent(event, {
+      total_price: checkoutTotalPrice,
+      first_discount_code: discountCode,
     });
   }
 }
