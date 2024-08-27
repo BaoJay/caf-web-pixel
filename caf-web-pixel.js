@@ -137,7 +137,7 @@ if (PAGE_VIEWED_EVENT) {
 }
 
 // PRODUCT VIEWED EVENT
-if (PRODUCT_VIEWED_EVENT) {
+if (PRODUCT_VIEWED_EVENT && window.location.href.includes("/product")) {
   const productVariant = PRODUCT_VIEWED_EVENT.data?.productVariant;
   triggerEvent(PRODUCT_VIEWED_EVENT, {
     content_ids: productVariant.product?.id,
@@ -170,7 +170,7 @@ if (PRODUCT_ADDED_TO_CART_EVENT) {
 }
 
 // COLLECTION VIEWED EVENT
-if (COLLECTION_VIEWED_EVENT) {
+if (COLLECTION_VIEWED_EVENT && window.location.href.includes("/collection")) {
   const collection = COLLECTION_VIEWED_EVENT.data?.collection;
   triggerEvent(COLLECTION_VIEWED_EVENT, {
     collection_id: collection.id,
@@ -180,7 +180,7 @@ if (COLLECTION_VIEWED_EVENT) {
 }
 
 // CART VIEWED EVENT
-if (CART_VIEWED_EVENT) {
+if (CART_VIEWED_EVENT && window.location.href.includes("/cart")) {
   const cart = CART_VIEWED_EVENT.data?.cart;
   triggerEvent(CART_VIEWED_EVENT, {
     num_items: cart.lines?.length,
@@ -190,7 +190,7 @@ if (CART_VIEWED_EVENT) {
 }
 
 // CHECKOUT STARTED EVENT
-if (CHECKOUT_STARTED_EVENT) {
+if (CHECKOUT_STARTED_EVENT && window.location.href.includes("/checkout")) {
   const checkout = CHECKOUT_STARTED_EVENT.data?.checkout;
   triggerEvent(CHECKOUT_STARTED_EVENT, {
     num_items: checkout.lineItems?.length,
