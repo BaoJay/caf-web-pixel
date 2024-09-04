@@ -6,10 +6,8 @@ function getLocalStorageData(key) {
 }
 const pixelID = getLocalStorageData("CAF_PIXEL_ID");
 const metaPixelID = pixelID.accountID;
-// console.log("metaPixelID ===== ", metaPixelID);
 
 const OTHER_EVENT = getLocalStorageData("GB_TRIGGER_EVENT");
-// console.log("other event =====", OTHER_EVENT.name, OTHER_EVENT);
 const PAGE_VIEWED_EVENT = getLocalStorageData("GB_TRIGGER_PAGE_VIEWED");
 const PRODUCT_VIEWED_EVENT = getLocalStorageData("GB_TRIGGER_PRODUCT_VIEWED");
 const PRODUCT_ADDED_TO_CART_EVENT = getLocalStorageData(
@@ -67,17 +65,6 @@ window.gbfbq = async function (
     typeof eventName === "string" &&
     eventName.trim() !== ""
   ) {
-    // console.log(
-    //   "pixelID === ",
-    //   pixelID,
-    //   "\neventName === ",
-    //   eventName,
-    //   "\npayload === ",
-    //   payload,
-    //   "\neventID === ",
-    //   eventID
-    // );
-    // Initialize the Facebook Pixel
     fbq("init", pixelID, eventID);
     // Use a switch statement to handle different event names
     switch (eventName) {
@@ -121,14 +108,6 @@ function convertShopifyToMetaEventName(eventName) {
 
 function triggerEvent(event, payload) {
   const metaEventName = convertShopifyToMetaEventName(event.name);
-  // console.log(
-  //   "Trigger event:",
-  //   metaEventName,
-  //   "with payload: ",
-  //   payload,
-  //   "for event: ",
-  //   event
-  // );
   gbfbq(metaPixelID, metaEventName, payload, event.id);
 }
 
@@ -153,24 +132,6 @@ if (PRODUCT_VIEWED_EVENT && window.location.href.includes("/product")) {
   });
   localStorage.removeItem("GB_TRIGGER_PRODUCT_VIEWED");
 }
-
-// PRODUCT ADDED TO CART EVENT
-// if (PRODUCT_ADDED_TO_CART_EVENT) {
-//   const cartLine = PRODUCT_ADDED_TO_CART_EVENT.data?.cartLine;
-//   triggerEvent(PRODUCT_ADDED_TO_CART_EVENT, {
-//     content_ids: [cartLine.merchandise?.product?.id],
-//     content_name:
-//       cartLine.merchandise?.product?.title ||
-//       cartLine.merchandise?.product?.untranslatedTitle,
-//     content_type: cartLine.merchandise?.product?.type,
-//     content_vendor: cartLine.merchandise?.product?.vendor,
-//     sku: cartLine.merchandise?.sku,
-//     currency: cartLine.merchandise?.price?.currencyCode,
-//     value: cartLine.merchandise?.price?.amount,
-//     quantity: cartLine.quantity,
-//   });
-//   localStorage.removeItem("GB_TRIGGER_PRODUCT_ADDED_TO_CART");
-// }
 
 // COLLECTION VIEWED EVENT
 if (COLLECTION_VIEWED_EVENT && window.location.href.includes("/collection")) {
