@@ -1,12 +1,31 @@
-console.log("caf-web-pixel.js is running");
-console.log("Rendering pixel from Github");
+// Return false or data
+function getLocalStorageData(key) {
+  return (
+    localStorage.getItem(key) !== null && JSON.parse(localStorage.getItem(key))
+  );
+}
+const pixelID = getLocalStorageData("CAF_PIXEL_ID");
+const metaPixelID = pixelID.accountID;
 
-const data = JSON.parse(localStorage.getItem("CAF_DATA_TRIGGER_EVENT"));
-const pixelID = JSON.parse(localStorage.getItem("CAF_PIXEL_ID"));
-console.log("data =====", data);
-console.log("pixelID =====", pixelID);
-const accountID = pixelID.pixelID;
+const OTHER_EVENT = getLocalStorageData("GB_TRIGGER_EVENT");
+const PAGE_VIEWED_EVENT = getLocalStorageData("GB_TRIGGER_PAGE_VIEWED");
+const PRODUCT_VIEWED_EVENT = getLocalStorageData("GB_TRIGGER_PRODUCT_VIEWED");
+const PRODUCT_ADDED_TO_CART_EVENT = getLocalStorageData(
+  "GB_TRIGGER_PRODUCT_ADDED_TO_CART"
+);
+const COLLECTION_VIEWED_EVENT = getLocalStorageData(
+  "GB_TRIGGER_COLLECTION_VIEWED"
+);
+const CART_VIEWED_EVENT = getLocalStorageData("GB_TRIGGER_CART_VIEWED");
+const CHECKOUT_STARTED_EVENT = getLocalStorageData(
+  "GB_TRIGGER_CHECKOUT_STARTED"
+);
+const CHECKOUT_COMPLETED_EVENT = getLocalStorageData(
+  "GB_TRIGGER_CHECKOUT_COMPLETED"
+);
+const GB_TRIGGER_SEARCH_EVENT = getLocalStorageData("GB_TRIGGER_SEARCH");
 
+// Step 1. Initialize the JavaScript pixel SDK (make sure to exclude HTML)
 !(function (f, b, e, v, n, t, s) {
   if (f.fbq) return;
   n = f.fbq = function () {
@@ -22,8 +41,6 @@ const accountID = pixelID.pixelID;
   t.src = v;
   s = b.getElementsByTagName(e)[0];
   s.parentNode.insertBefore(t, s);
-
-  console.log("Pixel is loaded");
 })(
   window,
   document,
@@ -31,249 +48,199 @@ const accountID = pixelID.pixelID;
   "https://connect.facebook.net/en_US/fbevents.js"
 );
 
-fbq("init", accountID); // Bao Testing 3629
+window.gbfbq = async function (
+  pixelID,
+  eventName,
+  payload,
+  eventID,
+  nameCustomEvent
+) {
+  if (!eventID || eventID === "") {
+    eventID = new Date().getTime();
+  }
 
-analytics.subscribe("all_events", (event) => {
-  console.log("subscribe event in external js === ", event.name);
-});
+  if (
+    typeof pixelID === "string" &&
+    pixelID.trim() !== "" &&
+    typeof eventName === "string" &&
+    eventName.trim() !== ""
+  ) {
+    fbq("init", pixelID, eventID);
+    // Use a switch statement to handle different event names
+    switch (eventName) {
+      case "PageView":
+        fbq("trackSingle", pixelID, "PageView", {}, { eventID });
+        break;
+      case "ViewContent":
+      case "Search":
+      case "AddToCart":
+      case "InitiateCheckout":
+      case "AddPaymentInfo":
+      case "Lead":
+      case "CompleteRegistration":
+      case "Purchase":
+      case "AddToWishlist":
+      case "CollectionView":
+      case "CartView":
+        fbq("trackSingle", pixelID, eventName, payload, { eventID });
+        break;
+      case "trackCustom":
+        fbq("trackSingle", pixelID, nameCustomEvent, payload, { eventID });
+        break;
+      default:
+        return;
+    }
+  }
+};
 
-// analytics.subscribe("all_events", (event) => {
-//   let payload;
-//   console.log("event name === ", event.name);
-//   switch (event.name) {
-//     case "page_viewed":
-//       fbq("track", "PageView");
-//       break;
-//     case "product_viewed":
-//       const productPrice = event.data.productVariant.price.amount;
-//       const productTitle = event.data.productVariant.title;
-//       payload = {
-//         event_name: event.name,
-//         event_data: {
-//           productPrice: productPrice,
-//           productTitle: productTitle,
-//         },
-//       };
-//       fbq("track", "ViewContent", payload);
-//       break;
-//     case "product_added_to_cart":
-//       const cartLine = event.data.cartLine;
-//       const cartLineCost = cartLine.cost.totalAmount.amount;
-//       const cartLineCostCurrency = cartLine.cost.totalAmount.currencyCode;
-//       const merchandiseVariantTitle = cartLine.merchandise.title;
-//       payload = {
-//         event_name: event.name,
-//         event_data: {
-//           cartLineCost: cartLineCost,
-//           cartLineCostCurrency: cartLineCostCurrency,
-//           merchandiseVariantTitle: merchandiseVariantTitle,
-//         },
-//       };
-//       break;
-//     case "checkout_started":
-//       const checkout = event.data.checkout;
-//       const checkoutTotalPrice = checkout.totalPrice.amount;
-//       const allDiscountCodes = checkout.discountApplications.map((discount) => {
-//         if (discount.type === "DISCOUNT_CODE") {
-//           return discount.title;
-//         }
-//       });
-//       const firstItem = checkout.lineItems[0];
-//       const firstItemDiscountedValue = firstItem.discountAllocations[0]?.amount;
-//       const customItemPayload = {
-//         quantity: firstItem.quantity,
-//         title: firstItem.title,
-//         discount: firstItemDiscountedValue,
-//       };
-//       payload = {
-//         event_name: event.name,
-//         event_data: {
-//           totalPrice: checkoutTotalPrice,
-//           discountCodesUsed: allDiscountCodes,
-//           firstItem: customItemPayload,
-//         },
-//       };
-//       //
-//       break;
-//     case "checkout_completed":
-//       // const checkout = event.data.checkout;
-//       // const checkoutTotalPrice = checkout.totalPrice.amount;
-//       // const allDiscountCodes = checkout.discountApplications.map((discount) => {
-//       //   if (discount.type === 'DISCOUNT_CODE') {
-//       //     return discount.title;
-//       //   }
-//       // });
-//       // const firstItem = checkout.lineItems[0];
-//       // const firstItemDiscountedValue = firstItem.discountAllocations[0]?.amount;
-//       // const customItemPayload = {
-//       //   quantity: firstItem.quantity,
-//       //   title: firstItem.title,
-//       //   discount: firstItemDiscountedValue,
-//       // };
-//       const paymentTransactions = event.data.checkout.transactions.map(
-//         (transaction) => {
-//           return {
-//             paymentGateway: transaction.gateway,
-//             amount: transaction.amount,
-//           };
-//         }
-//       );
-//       payload = {
-//         event_name: event.name,
-//         event_data: {
-//           totalPrice: checkoutTotalPrice,
-//           discountCodesUsed: allDiscountCodes,
-//           firstItem: customItemPayload,
-//           paymentTransactions: paymentTransactions,
-//         },
-//       };
-//       break;
-//     case "search_submitted":
-//       const searchResult = event.data.searchResult;
-//       const searchQuery = searchResult.query;
-//       const firstProductReturnedFromSearch =
-//         searchResult.productVariants[0]?.product.title;
-//       payload = {
-//         event_name: event.name,
-//         event_data: {
-//           searchQuery: searchQuery,
-//           firstProductTitle: firstProductReturnedFromSearch,
-//         },
-//       };
-//       break;
-//     case "payment_info_submitted":
-//       // const checkout = event.data.checkout;
-//       // const checkoutTotalPrice = checkout.totalPrice.amount;
-//       const firstDiscountType = checkout.discountApplications[0]?.type;
-//       const discountCode =
-//         firstDiscountType === "DISCOUNT_CODE"
-//           ? checkout.discountApplications[0]?.title
-//           : null;
-//       payload = {
-//         event_name: event.name,
-//         event_data: {
-//           totalPrice: checkoutTotalPrice,
-//           firstDiscountCode: discountCode,
-//         },
-//       };
-//       break;
-//     default:
-//       console.log("This is default event", event);
-//   }
-// });
+function convertShopifyToMetaEventName(eventName) {
+  if (eventName === "page_viewed") return "PageView";
+  if (eventName === "product_viewed") return "ViewContent";
+  if (eventName === "collection_viewed") return "CollectionView"; // Custom event
+  if (eventName === "cart_viewed") return "CartView"; // Custom event
+  if (eventName === "product_added_to_cart") return "AddToCart";
+  if (eventName === "checkout_started") return "InitiateCheckout";
+  if (eventName === "checkout_completed") return "Purchase";
+  if (eventName === "payment_info_submitted") return "AddPaymentInfo";
+  if (eventName === "search_submitted") return "Search";
+  return eventName;
+}
 
-// analytics.subscribe('product_viewed', (event) => {
-//   const productPrice = event.data.productVariant.price.amount;
-//   const productTitle = event.data.productVariant.title;
-//   const payload = {
-//     event_name: event.name,
-//     event_data: {
-//       productPrice: productPrice,
-//       productTitle: productTitle,
-//     },
-//   };
+function triggerEvent(event, payload) {
+  const metaEventName = convertShopifyToMetaEventName(event.name);
+  gbfbq(metaPixelID, metaEventName, payload, event.id);
+}
 
-// });
+// =================== TRIGGER ZONE THEN REMOVE IT FROM LOCAL STORAGE ===================
+// PAGE VIEWED EVENT
+if (PAGE_VIEWED_EVENT) {
+  triggerEvent(PAGE_VIEWED_EVENT, {});
+  localStorage.removeItem("GB_TRIGGER_PAGE_VIEWED");
+}
 
-// analytics.subscribe('product_added_to_cart', (event) => {
-//   const cartLine = event.data.cartLine;
-//   const cartLineCost = cartLine.cost.totalAmount.amount;
-//   const cartLineCostCurrency = cartLine.cost.totalAmount.currencyCode;
-//   const merchandiseVariantTitle = cartLine.merchandise.title;
-//   const payload = {
-//     event_name: event.name,
-//     event_data: {
-//       cartLineCost: cartLineCost,
-//       cartLineCostCurrency: cartLineCostCurrency,
-//       merchandiseVariantTitle: merchandiseVariantTitle,
-//     },
-//   };
+// PRODUCT VIEWED EVENT
+if (PRODUCT_VIEWED_EVENT && window.location.href.includes("/product")) {
+  const productVariant = PRODUCT_VIEWED_EVENT.data?.productVariant;
+  triggerEvent(PRODUCT_VIEWED_EVENT, {
+    content_ids: productVariant.product?.id,
+    content_name: productVariant.product?.title,
+    content_type: productVariant.product?.type,
+    content_vendor: productVariant.product?.vendor,
+    sku: productVariant.sku,
+    currency: productVariant.price?.currencyCode,
+    value: productVariant.price?.amount,
+  });
+  localStorage.removeItem("GB_TRIGGER_PRODUCT_VIEWED");
+}
 
-// });
+// COLLECTION VIEWED EVENT
+if (COLLECTION_VIEWED_EVENT && window.location.href.includes("/collection")) {
+  const collection = COLLECTION_VIEWED_EVENT.data?.collection;
+  triggerEvent(COLLECTION_VIEWED_EVENT, {
+    collection_id: collection.id,
+    collection_name: collection.title,
+  });
+  localStorage.removeItem("GB_TRIGGER_COLLECTION_VIEWED");
+}
 
-// analytics.subscribe('checkout_started', (event) => {
-//   const checkout = event.data.checkout;
-//   const checkoutTotalPrice = checkout.totalPrice.amount;
-//   const allDiscountCodes = checkout.discountApplications.map((discount) => {
-//     if (discount.type === 'DISCOUNT_CODE') {
-//       return discount.title;
-//     }
-//   });
-//   const firstItem = checkout.lineItems[0];
-//   const firstItemDiscountedValue = firstItem.discountAllocations[0]?.amount;
-//   const customItemPayload = {
-//     quantity: firstItem.quantity,
-//     title: firstItem.title,
-//     discount: firstItemDiscountedValue,
-//   };
-//   const payload = {
-//     event_name: event.name,
-//     event_data: {
-//       totalPrice: checkoutTotalPrice,
-//       discountCodesUsed: allDiscountCodes,
-//       firstItem: customItemPayload,
-//     },
-//   };
+// CART VIEWED EVENT
+if (CART_VIEWED_EVENT && window.location.href.includes("/cart")) {
+  const cart = CART_VIEWED_EVENT.data?.cart;
+  triggerEvent(CART_VIEWED_EVENT, {
+    num_items: cart.lines?.length,
+    value: cart.totalQuantity,
+  });
+  localStorage.removeItem("GB_TRIGGER_CART_VIEWED");
+}
 
-// });
+// CHECKOUT STARTED EVENT
+if (CHECKOUT_STARTED_EVENT && window.location.href.includes("/checkout")) {
+  const checkout = CHECKOUT_STARTED_EVENT.data?.checkout;
+  triggerEvent(CHECKOUT_STARTED_EVENT, {
+    num_items: checkout.lineItems?.length,
+    value: checkout.totalPrice?.amount,
+  });
+  localStorage.removeItem("GB_TRIGGER_CHECKOUT");
+}
 
-// analytics.subscribe('checkout_completed', (event) => {
-//   const checkout = event.data.checkout;
-//   const checkoutTotalPrice = checkout.totalPrice.amount;
-//   const allDiscountCodes = checkout.discountApplications.map((discount) => {
-//     if (discount.type === 'DISCOUNT_CODE') {
-//       return discount.title;
-//     }
-//   });
-//   const firstItem = checkout.lineItems[0];
-//   const firstItemDiscountedValue = firstItem.discountAllocations[0]?.amount;
-//   const customItemPayload = {
-//     quantity: firstItem.quantity,
-//     title: firstItem.title,
-//     discount: firstItemDiscountedValue,
-//   };
-//   const paymentTransactions = event.data.checkout.transactions.map((transaction) => {
-//     return {
-//       paymentGateway: transaction.gateway,
-//       amount: transaction.amount,
-//     };
-//   });
-//   const payload = {
-//     event_name: event.name,
-//     event_data: {
-//       totalPrice: checkoutTotalPrice,
-//       discountCodesUsed: allDiscountCodes,
-//       firstItem: customItemPayload,
-//       paymentTransactions: paymentTransactions,
-//     },
-//   };
+// CHECKOUT COMPLETED EVENT
+if (CHECKOUT_COMPLETED_EVENT) {
+  const checkout = CHECKOUT_COMPLETED_EVENT.data?.checkout;
+  const checkoutTotalPrice = checkout.totalPrice?.amount;
+  const allDiscountCodes = checkout.discountApplications?.map((discount) => {
+    if (discount.type === "DISCOUNT_CODE") {
+      return discount.title;
+    }
+  });
+  const paymentTransactions = checkout.transactions?.map((transaction) => {
+    return {
+      paymentGateway: transaction.gateway,
+      amount: transaction.amount,
+    };
+  });
+  triggerEvent(CHECKOUT_COMPLETED_EVENT, {
+    totalPrice: checkoutTotalPrice,
+    discountCodesUsed: allDiscountCodes,
+    paymentTransactions: paymentTransactions,
+  });
+  localStorage.removeItem("GB_TRIGGER_CHECKOUT_COMPLETED");
+}
 
-// });
+// SEARCH EVENT
+if (GB_TRIGGER_SEARCH_EVENT) {
+  const searchResult = GB_TRIGGER_SEARCH_EVENT.data.searchResult;
+  triggerEvent(GB_TRIGGER_SEARCH_EVENT, {
+    search_query: searchResult.query,
+    first_product_title: searchResult.productVariants[0]?.product.title,
+  });
+  localStorage.removeItem("GB_TRIGGER_SEARCH");
+}
 
-// analytics.subscribe('search_submitted', (event) => {
-//   const searchResult = event.data.searchResult;
-//   const searchQuery = searchResult.query;
-//   const firstProductReturnedFromSearch = searchResult.productVariants[0]?.product.title;
-//   const payload = {
-//     event_name: event.name,
-//     event_data: {
-//       searchQuery: searchQuery,
-//       firstProductTitle: firstProductReturnedFromSearch,
-//     },
-//   };
+const style =
+  "background-color: darkblue; color: white; font-style: italic; border-radius: 5px; padding: 5px; font-size: 1em;";
 
-// });
+// Function to handle the custom event
+function handleCustomEvent(customEvent) {
+  console.log("Handle customEvent in BaoJay: ", customEvent.detail);
+  const event = customEvent.detail;
+  if (event.name === "product_added_to_cart") {
+    console.log(
+      "%cproduct_added_to_cart is trigger in BaoJay. Muahahahahahaha",
+      style
+    );
+    const cartLine = event.data?.cartLine;
 
-// analytics.subscribe('payment_info_submitted', (event) => {
-//   const checkout = event.data.checkout;
-//   const checkoutTotalPrice = checkout.totalPrice.amount;
-//   const firstDiscountType = checkout.discountApplications[0]?.type;
-//   const discountCode = firstDiscountType === 'DISCOUNT_CODE' ? checkout.discountApplications[0]?.title : null;
-//   const payload = {
-//     event_name: event.name,
-//     event_data: {
-//       totalPrice: checkoutTotalPrice,
-//       firstDiscountCode: discountCode,
-//     },
-//   };
-// });
+    triggerEvent(event, {
+      content_ids: [cartLine.merchandise?.product?.id],
+      content_name:
+        cartLine.merchandise?.product?.title ||
+        cartLine.merchandise?.product?.untranslatedTitle,
+      content_type: cartLine.merchandise?.product?.type,
+      content_vendor: cartLine.merchandise?.product?.vendor,
+      sku: cartLine.merchandise?.sku,
+      currency: cartLine.merchandise?.price?.currencyCode,
+      value: cartLine.merchandise?.price?.amount,
+      quantity: cartLine.quantity,
+    });
+  } else if (event.name === "payment_info_submitted") {
+    console.log(
+      "%cpayment_info_submitted is trigger in BaoJay. Muahahahahahaha",
+      style
+    );
+    const checkout = event.data.checkout;
+    const checkoutTotalPrice = checkout.totalPrice?.amount;
+    const firstDiscountType = checkout.discountApplications[0]?.type;
+    const discountCode =
+      firstDiscountType === "DISCOUNT_CODE"
+        ? checkout.discountApplications[0]?.title
+        : null;
+
+    triggerEvent(event, {
+      total_price: checkoutTotalPrice,
+      first_discount_code: discountCode,
+    });
+  }
+}
+
+// Add an event listener for the custom event
+window.addEventListener("customEvent", handleCustomEvent, false);
