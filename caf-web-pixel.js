@@ -5,7 +5,7 @@ function getLocalStorageData(key) {
   );
 }
 const pixelID = getLocalStorageData("CAF_PIXEL_ID");
-const metaPixelID = pixelID.accountID;
+const metaPixelIDs = pixelID.accountID;
 
 const OTHER_EVENT = getLocalStorageData("GB_TRIGGER_EVENT");
 const PAGE_VIEWED_EVENT = getLocalStorageData("GB_TRIGGER_PAGE_VIEWED");
@@ -108,7 +108,9 @@ function convertShopifyToMetaEventName(eventName) {
 
 function triggerEvent(event, payload) {
   const metaEventName = convertShopifyToMetaEventName(event.name);
-  gbfbq(metaPixelID, metaEventName, payload, event.id);
+  metaPixelIDs.array.forEach((metaPixelID) => {
+    gbfbq(metaPixelID, metaEventName, payload, event.id);
+  });
 }
 
 // =================== TRIGGER ZONE THEN REMOVE IT FROM LOCAL STORAGE ===================
