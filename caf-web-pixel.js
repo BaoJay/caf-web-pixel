@@ -161,6 +161,7 @@ if (CHECKOUT_STARTED_EVENT && window.location.href.includes("/checkout")) {
   triggerEvent(CHECKOUT_STARTED_EVENT, {
     num_items: checkout.lineItems?.length,
     value: checkout.totalPrice?.amount,
+    currency: checkout.totalPrice?.currencyCode,
   });
   localStorage.removeItem("GB_TRIGGER_CHECKOUT");
 }
@@ -184,6 +185,9 @@ if (CHECKOUT_COMPLETED_EVENT) {
     totalPrice: checkoutTotalPrice,
     discountCodesUsed: allDiscountCodes,
     paymentTransactions: paymentTransactions,
+    num_items: checkout.lineItems?.length,
+    value: checkout.totalPrice?.amount,
+    currency: checkout.totalPrice?.currencyCode,
   });
   localStorage.removeItem("GB_TRIGGER_CHECKOUT_COMPLETED");
 }
