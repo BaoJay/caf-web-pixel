@@ -160,8 +160,8 @@ if (CART_VIEWED_EVENT && window.location.href.includes("/cart")) {
 if (CHECKOUT_STARTED_EVENT && window.location.href.includes("/checkout")) {
   const checkout = CHECKOUT_STARTED_EVENT.data?.checkout;
   console.log("checkout", checkout);
-  const content_ids = checkout.lineItems?.map(
-    (lineItem) => lineItem.variant?.product?.id
+  const content_ids = checkout.lineItems?.map((lineItem) =>
+    parseInt(lineItem.variant?.product?.id)
   );
   const itemQuantity = checkout.lineItems?.map((lineItem) => lineItem.quantity);
   const num_items = itemQuantity.reduce((a, b) => a + b, 0);
