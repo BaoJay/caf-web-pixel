@@ -107,7 +107,6 @@ function convertShopifyToMetaEventName(eventName) {
 
 function triggerEvent(event, payload) {
   const metaEventName = convertShopifyToMetaEventName(event.name);
-  console.log("Triggering event with IDs: ", metaPixelIDs);
   metaPixelIDs.forEach((metaPixelID) => {
     gbfbq(metaPixelID, metaEventName, payload, event.id);
   });
@@ -121,6 +120,7 @@ if (PAGE_VIEWED_EVENT) {
 }
 
 // PRODUCT VIEWED EVENT
+// aka ViewContent
 if (PRODUCT_VIEWED_EVENT && window.location.href.includes("/product")) {
   const productVariant = PRODUCT_VIEWED_EVENT.data?.productVariant;
   triggerEvent(PRODUCT_VIEWED_EVENT, {
@@ -156,8 +156,10 @@ if (CART_VIEWED_EVENT && window.location.href.includes("/cart")) {
 }
 
 // CHECKOUT STARTED EVENT
+// aka InitiateCheckout
 if (CHECKOUT_STARTED_EVENT && window.location.href.includes("/checkout")) {
   const checkout = CHECKOUT_STARTED_EVENT.data?.checkout;
+  console.log("checkout", checkout);
   triggerEvent(CHECKOUT_STARTED_EVENT, {
     num_items: checkout.lineItems?.length,
     value: checkout.totalPrice?.amount,
@@ -167,6 +169,7 @@ if (CHECKOUT_STARTED_EVENT && window.location.href.includes("/checkout")) {
 }
 
 // CHECKOUT COMPLETED EVENT
+// aka Purchase
 if (CHECKOUT_COMPLETED_EVENT) {
   const checkout = CHECKOUT_COMPLETED_EVENT.data?.checkout;
   const checkoutTotalPrice = checkout.totalPrice?.amount;
@@ -207,13 +210,8 @@ const style =
 
 // Function to handle the custom event
 function handleCustomEvent(customEvent) {
-  console.log("Handle customEvent in BaoJay: ", customEvent.detail);
   const event = customEvent.detail;
   if (event.name === "product_added_to_cart") {
-    console.log(
-      "%cproduct_added_to_cart is trigger in BaoJay. Muahahahahahaha",
-      style
-    );
     const cartLine = event.data?.cartLine;
 
     triggerEvent(event, {
@@ -229,10 +227,6 @@ function handleCustomEvent(customEvent) {
       quantity: cartLine.quantity,
     });
   } else if (event.name === "payment_info_submitted") {
-    console.log(
-      "%cpayment_info_submitted is trigger in BaoJay. Muahahahahahaha",
-      style
-    );
     const checkout = event.data.checkout;
     const checkoutTotalPrice = checkout.totalPrice?.amount;
     const firstDiscountType = checkout.discountApplications[0]?.type;
