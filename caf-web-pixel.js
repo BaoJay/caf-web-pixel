@@ -163,10 +163,10 @@ if (CHECKOUT_STARTED_EVENT && window.location.href.includes("/checkout")) {
   const content_ids = checkout.lineItems?.map((lineItem) =>
     parseInt(lineItem.variant?.product?.id)
   );
-  const itemQuantity = checkout.lineItems?.map((lineItem) => lineItem.quantity);
-  const num_items = itemQuantity.reduce((a, b) => a + b, 0);
-  console.log("content_ids", content_ids);
-  console.log("num_items", num_items);
+  const itemsQuantity = checkout.lineItems?.map(
+    (lineItem) => lineItem.quantity
+  );
+  const num_items = itemsQuantity.reduce((a, b) => a + b, 0);
   triggerEvent(CHECKOUT_STARTED_EVENT, {
     content_ids,
     currency: checkout.totalPrice?.currencyCode,
@@ -192,12 +192,20 @@ if (CHECKOUT_COMPLETED_EVENT) {
       amount: transaction.amount,
     };
   });
+  const content_ids = checkout.lineItems?.map((lineItem) =>
+    parseInt(lineItem.variant?.product?.id)
+  );
+  const itemsQuantity = checkout.lineItems?.map(
+    (lineItem) => lineItem.quantity
+  );
+  const num_items = itemsQuantity.reduce((a, b) => a + b, 0);
   triggerEvent(CHECKOUT_COMPLETED_EVENT, {
     totalPrice: checkoutTotalPrice,
     discountCodesUsed: allDiscountCodes,
     paymentTransactions: paymentTransactions,
+    content_ids,
     currency: checkout.totalPrice?.currencyCode,
-    num_items: checkout.lineItems?.length,
+    num_items,
     value: checkout.totalPrice?.amount,
   });
   localStorage.removeItem("GB_TRIGGER_CHECKOUT_COMPLETED");
