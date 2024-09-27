@@ -160,10 +160,15 @@ if (CART_VIEWED_EVENT && window.location.href.includes("/cart")) {
 if (CHECKOUT_STARTED_EVENT && window.location.href.includes("/checkout")) {
   const checkout = CHECKOUT_STARTED_EVENT.data?.checkout;
   console.log("checkout", checkout);
+  const content_ids = checkout.lineItems?.map(
+    (lineItem) => lineItem.variant?.product?.id
+  );
+  console.log("content_ids", content_ids);
   triggerEvent(CHECKOUT_STARTED_EVENT, {
+    content_ids,
+    currency: checkout.totalPrice?.currencyCode,
     num_items: checkout.lineItems?.length,
     value: checkout.totalPrice?.amount,
-    currency: checkout.totalPrice?.currencyCode,
   });
   localStorage.removeItem("GB_TRIGGER_CHECKOUT");
 }
@@ -188,9 +193,9 @@ if (CHECKOUT_COMPLETED_EVENT) {
     totalPrice: checkoutTotalPrice,
     discountCodesUsed: allDiscountCodes,
     paymentTransactions: paymentTransactions,
+    currency: checkout.totalPrice?.currencyCode,
     num_items: checkout.lineItems?.length,
     value: checkout.totalPrice?.amount,
-    currency: checkout.totalPrice?.currencyCode,
   });
   localStorage.removeItem("GB_TRIGGER_CHECKOUT_COMPLETED");
 }
