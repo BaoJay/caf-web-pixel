@@ -163,11 +163,14 @@ if (CHECKOUT_STARTED_EVENT && window.location.href.includes("/checkout")) {
   const content_ids = checkout.lineItems?.map(
     (lineItem) => lineItem.variant?.product?.id
   );
+  const itemQuantity = checkout.lineItems?.map((lineItem) => lineItem.quantity);
+  const num_items = itemQuantity.reduce((a, b) => a + b, 0);
   console.log("content_ids", content_ids);
+  console.log("num_items", num_items);
   triggerEvent(CHECKOUT_STARTED_EVENT, {
     content_ids,
     currency: checkout.totalPrice?.currencyCode,
-    num_items: checkout.lineItems?.length,
+    num_items,
     value: checkout.totalPrice?.amount,
   });
   localStorage.removeItem("GB_TRIGGER_CHECKOUT");
