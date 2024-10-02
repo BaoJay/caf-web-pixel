@@ -107,6 +107,7 @@ function convertShopifyToMetaEventName(eventName) {
 
 function triggerEvent(event, payload) {
   const metaEventName = convertShopifyToMetaEventName(event.name);
+  console.log("event", event);
   metaPixelIDs.forEach((metaPixelID) => {
     gbfbq(metaPixelID, metaEventName, payload, event.id);
   });
