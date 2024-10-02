@@ -27,54 +27,51 @@ function otIsJsonString(t) {
   }
   return !0;
 }
-function otSetCookie(t, e, o) {
-  var n = new Date(),
-    o =
-      (n.setTime(n.getTime() + 24 * o * 60 * 60 * 1e3),
-      "expires=" + n.toGMTString());
-  document.cookie = t + "=" + e + ";" + o + ";path=/";
+function otSetCookie(name, value, days) {
+  const date = new Date();
+  date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+  const expires = "expires=" + date.toGMTString();
+  document.cookie = `${name}=${value};${expires};path=/`;
 }
-function otGetCookie(t) {
-  var o = t + "=",
-    n = (document.cookie, document.cookie.split(";"));
-  for (let e = 0; e < n.length; e++) {
-    let t = n[e];
-    for (; " " == t.charAt(0); ) t = t.substring(1);
-    if (0 == t.indexOf(o)) return t.substring(o.length, t.length);
+function otGetCookie(name) {
+  const nameEQ = name + "=";
+  const cookies = document.cookie.split(";");
+
+  for (const cookie of cookies) {
+    let cookieTrimmed = cookie.trim();
+    if (cookieTrimmed.startsWith(nameEQ)) {
+      return cookieTrimmed.substring(nameEQ.length, cookieTrimmed.length);
+    }
   }
   return "";
 }
-function otDeleteCookie(t, e, o) {
-  var n = new Date(),
-    n = (n.setTime(n.getTime() + 0), "expires=" + n.toUTCString());
-  document.cookie = t + "=0;" + n + ";path=/";
+function otDeleteCookie(name) {
+  const date = new Date();
+  date.setTime(date.getTime() + 0); // Set the expiration date to the past
+  const expires = "expires=" + date.toUTCString();
+  document.cookie = `${name}=;${expires};path=/`;
 }
-function generateEventID(t) {
-  for (
-    var e =
-        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".split(
-          ""
-        ),
-      o = [],
-      n = 0;
-    n < t;
-    n++
-  ) {
-    var a = (Math.random() * (e.length - 1)).toFixed(0);
-    o[n] = e[a];
+function generateEventID(length) {
+  const characters =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+  const charactersArray = characters.split("");
+  let result = [];
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * charactersArray.length);
+    result.push(charactersArray[randomIndex]);
   }
-  return o.join("");
+
+  return result.join("");
 }
 function ot_getUrlParam(t) {
   t = window.location.search.match("[?&]" + t + "(?:&|$|=([^&]*))");
   return t ? t[1] || "" : null;
 }
-function getRandomInt(t, e) {
-  return (
-    (t = Math.ceil(t)),
-    (e = Math.floor(e)),
-    Math.floor(Math.random() * (e - t) + t)
-  );
+function getRandomInt(min, max) {
+  const minCeil = Math.ceil(min);
+  const maxFloor = Math.floor(max);
+  return Math.floor(Math.random() * (maxFloor - minCeil) + minCeil);
 }
 async function sha256(t) {
   (t = new TextEncoder().encode(t)),
@@ -177,13 +174,20 @@ function otDetectFbc(t, e) {
     : null;
 }
 function otFBDetectExternalID() {
-  var t = otGetCookie("c_user"),
-    e = otGetCookie("ex_id");
-  return null != t && "" !== t
-    ? (otSetCookie("ex_id", e, 14), t)
-    : ((null != e && "" !== e) ||
-        otSetCookie("ex_id", (e = generateEventID(10)), 14),
-      e);
+  const userId = otGetCookie("c_user");
+  let externalId = otGetCookie("ex_id");
+
+  if (userId !== null && userId !== "") {
+    otSetCookie("ex_id", externalId, 14);
+    return userId;
+  }
+
+  if (externalId === null || externalId === "") {
+    externalId = generateEventID(10);
+    otSetCookie("ex_id", externalId, 14);
+  }
+
+  return externalId;
 }
 function otDetectFbp(t, e, o) {
   var n = otGetCookie("OT_FBPLID"),

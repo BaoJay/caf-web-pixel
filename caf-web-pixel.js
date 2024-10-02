@@ -24,6 +24,160 @@ const CHECKOUT_COMPLETED_EVENT = getLocalStorageData(
 );
 const GB_TRIGGER_SEARCH_EVENT = getLocalStorageData("GB_TRIGGER_SEARCH");
 
+// IP ADDRESS related
+let gb_ip = "";
+function getIP() {
+  return fetch("https://www.cloudflare.com/cdn-cgi/trace").then((t) =>
+    t.text()
+  );
+}
+function isIPv6(ip) {
+  const ipv6Pattern = `
+    ^(?:
+      (?:[a-fA-F\\d]{1,4}:){7}(?:[a-fA-F\\d]{1,4}|:)|
+      (?:[a-fA-F\\d]{1,4}:){6}
+        (?:
+          (?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)
+          (?:\\.(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}|
+          :[a-fA-F\\d]{1,4}|
+          :
+        )|
+      (?:[a-fA-F\\d]{1,4}:){5}
+        (?:
+          :(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)
+          (?:\\.(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}|
+          (?::[a-fA-F\\d]{1,4}){1,2}|
+          :
+        )|
+      (?:[a-fA-F\\d]{1,4}:){4}
+        (?:
+          (?::[a-fA-F\\d]{1,4}){0,1}:
+          (?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)
+          (?:\\.(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}|
+          (?::[a-fA-F\\d]{1,4}){1,3}|
+          :
+        )|
+      (?:[a-fA-F\\d]{1,4}:){3}
+        (?:
+          (?::[a-fA-F\\d]{1,4}){0,2}:
+          (?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)
+          (?:\\.(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}|
+          (?::[a-fA-F\\d]{1,4}){1,4}|
+          :
+        )|
+      (?:[a-fA-F\\d]{1,4}:){2}
+        (?:
+          (?::[a-fA-F\\d]{1,4}){0,3}:
+          (?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)
+          (?:\\.(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}|
+          (?::[a-fA-F\\d]{1,4}){1,5}|
+          :
+        )|
+      (?:[a-fA-F\\d]{1,4}:){1}
+        (?:
+          (?::[a-fA-F\\d]{1,4}){0,4}:
+          (?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)
+          (?:\\.(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}|
+          (?::[a-fA-F\\d]{1,4}){1,6}|
+          :
+        )|
+      (?:
+        (?::(?::[a-fA-F\\d]{1,4}){0,5}:
+        (?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)
+        (?:\\.(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}|
+        (?::[a-fA-F\\d]{1,4}){1,7}|
+        :
+      ))
+    )
+    (?:%[0-9a-zA-Z]{1,})?$
+  `.replace(/\s+/g, "");
+
+  return new RegExp(ipv6Pattern, "gm").test(ip);
+}
+function ipv4ToIpv6(ipv4) {
+  const segments = ipv4.split(".").map((segment) => parseInt(segment, 10));
+
+  if (
+    segments.length !== 4 ||
+    segments.some((segment) => isNaN(segment) || segment < 0 || segment > 255)
+  ) {
+    throw new Error("Invalid IPv4 address format");
+  }
+
+  const ipv6Segments = segments.map((segment) =>
+    segment.toString(16).padStart(2, "0")
+  );
+  return `::ffff:${ipv6Segments[0]}:${ipv6Segments[1]}:${ipv6Segments[2]}:${ipv6Segments[3]}`;
+}
+function isIPv4(ip) {
+  const ipv4Pattern = `
+    ^(
+      25[0-5]|
+      2[0-4][0-9]|
+      [01]?[0-9][0-9]?
+    )\\.
+    (
+      25[0-5]|
+      2[0-4][0-9]|
+      [01]?[0-9][0-9]?
+    )\\.
+    (
+      25[0-5]|
+      2[0-4][0-9]|
+      [01]?[0-9][0-9]?
+    )\\.
+    (
+      25[0-5]|
+      2[0-4][0-9]|
+      [01]?[0-9][0-9]?
+    )$
+  `.replace(/\s+/g, "");
+
+  return new RegExp(ipv4Pattern).test(ip);
+}
+async function otDetectIP() {
+  try {
+    if (gb_ip !== "") return gb_ip;
+
+    let detectedIP = "";
+    const response = await getIP();
+    const ip = response.split("ip=")[1].split("\n")[0];
+
+    if (ip === null || ip === undefined) return "";
+    // const excludedShops = [
+    //   "duong-test-px3.myshopify.com",
+    //   "juntestpx.myshopify.com",
+    //   "12b241-2.myshopify.com",
+    //   "personalizeddoghouse.myshopify.com",
+    //   "mellydecor.myshopify.com",
+    //   "creek-lander.myshopify.com",
+    //   "custype.myshopify.com",
+    //   "ericajewelstoronro.myshopify.com",
+    //   "blunico.myshopify.com",
+    //   "fitin30s.myshopify.com",
+    //   "petti-store-japan.myshopify.com",
+    //   "seniors-bra.myshopify.com",
+    //   "vevacare.myshopify.com",
+    //   "b71922.myshopify.com",
+    //   "8b47b5.myshopify.com",
+    //   "theuptest.myshopify.com",
+    //   "a0224c.myshopify.com",
+    //   "98f2a2-2.myshopify.com",
+    //   "superladystar.myshopify.com",
+    // ];
+
+    // if (!excludedShops.includes(ot_fb_shop) && (isIPv4(ip) || isIPv6(ip))) {
+    //   detectedIP = isIPv6(ip) ? ip : ipv4ToIpv6(ip);
+    // }
+    detectedIP = isIPv6(ip) ? ip : ipv4ToIpv6(ip);
+    console.log("detectedIP === ", detectedIP);
+
+    return detectedIP;
+  } catch (error) {
+    return "";
+  }
+}
+
 // Step 1. Initialize the JavaScript pixel SDK (make sure to exclude HTML)
 !(function (f, b, e, v, n, t, s) {
   if (f.fbq) return;
@@ -57,6 +211,12 @@ window.gbfbq = async function (
   if (!eventID || eventID === "") {
     eventID = new Date().getTime();
   }
+  const userIP = await otDetectIP();
+  const eventAdvancedMatching = {
+    eventID,
+    client_ip_address: userIP,
+  };
+  console.log("eventAdvancedMatching", eventAdvancedMatching);
 
   if (
     typeof pixelID === "string" &&
@@ -64,7 +224,7 @@ window.gbfbq = async function (
     typeof eventName === "string" &&
     eventName.trim() !== ""
   ) {
-    fbq("init", pixelID, eventID);
+    fbq("init", pixelID, eventAdvancedMatching);
     // Use a switch statement to handle different event names
     switch (eventName) {
       case "PageView":
