@@ -293,56 +293,64 @@ function isIPv6(t) {
     t
   );
 }
-function ipv4ToIpv6(t) {
-  t = t.split(".").map((t) => parseInt(t, 10));
-  if (4 !== t.length || t.some((t) => isNaN(t) || t < 0 || 255 < t))
+function ipv4ToIpv6(ipv4) {
+  const segments = ipv4.split(".").map((segment) => parseInt(segment, 10));
+
+  if (
+    segments.length !== 4 ||
+    segments.some((segment) => isNaN(segment) || segment < 0 || segment > 255)
+  ) {
     throw new Error("Invalid IPv4 address format");
-  return (
-    `::ffff:${t[0].toString(16).padStart(2, "0")}:${t[1]
-      .toString(16)
-      .padStart(2, "0")}:${t[2].toString(16).padStart(2, "0")}:` +
-    t[3].toString(16).padStart(2, "0")
+  }
+
+  const ipv6Segments = segments.map((segment) =>
+    segment.toString(16).padStart(2, "0")
   );
+  return `::ffff:${ipv6Segments[0]}:${ipv6Segments[1]}:${ipv6Segments[2]}:${ipv6Segments[3]}`;
 }
-function isIPv4(t) {
-  return /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(
-    t
-  );
+function isIPv4(ip) {
+  const ipv4Pattern =
+    /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+  return ipv4Pattern.test(ip);
 }
 async function otDetectIP() {
   try {
-    if ("" != ot_ip) return ot_ip;
-    let e = "";
-    return (
-      await getIP().then((t) => {
-        null == (ip = t.split("ip=")[1].split("\n")[0]) ||
-          null == ip ||
-          ("duong-test-px3.myshopify.com" != ot_fb_shop &&
-            "juntestpx.myshopify.com" != ot_fb_shop &&
-            "12b241-2.myshopify.com" != ot_fb_shop &&
-            "personalizeddoghouse.myshopify.com" != ot_fb_shop &&
-            "mellydecor.myshopify.com" != ot_fb_shop &&
-            "creek-lander.myshopify.com" != ot_fb_shop &&
-            "custype.myshopify.com" != ot_fb_shop &&
-            "ericajewelstoronro.myshopify.com" != ot_fb_shop &&
-            "blunico.myshopify.com" != ot_fb_shop &&
-            "fitin30s.myshopify.com" != ot_fb_shop &&
-            "petti-store-japan.myshopify.com" != ot_fb_shop &&
-            "seniors-bra.myshopify.com" != ot_fb_shop &&
-            "vevacare.myshopify.com" != ot_fb_shop &&
-            "b71922.myshopify.com" != ot_fb_shop &&
-            "8b47b5.myshopify.com" != ot_fb_shop &&
-            "theuptest.myshopify.com" != ot_fb_shop &&
-            "a0224c.myshopify.com" != ot_fb_shop &&
-            "98f2a2-2.myshopify.com" != ot_fb_shop &&
-            "superladystar.myshopify.com" != ot_fb_shop) ||
-          (!isIPv4(ip) && !isIPv6(ip)) ||
-          isIPv6((e = ip)) ||
-          (e = ipv4ToIpv6(ip));
-      }),
-      e
-    );
-  } catch (t) {
+    if (ot_ip !== "") return ot_ip;
+
+    let detectedIP = "";
+    const response = await getIP();
+    const ip = response.split("ip=")[1].split("\n")[0];
+
+    if (ip === null || ip === undefined) return "";
+
+    const excludedShops = [
+      "duong-test-px3.myshopify.com",
+      "juntestpx.myshopify.com",
+      "12b241-2.myshopify.com",
+      "personalizeddoghouse.myshopify.com",
+      "mellydecor.myshopify.com",
+      "creek-lander.myshopify.com",
+      "custype.myshopify.com",
+      "ericajewelstoronro.myshopify.com",
+      "blunico.myshopify.com",
+      "fitin30s.myshopify.com",
+      "petti-store-japan.myshopify.com",
+      "seniors-bra.myshopify.com",
+      "vevacare.myshopify.com",
+      "b71922.myshopify.com",
+      "8b47b5.myshopify.com",
+      "theuptest.myshopify.com",
+      "a0224c.myshopify.com",
+      "98f2a2-2.myshopify.com",
+      "superladystar.myshopify.com",
+    ];
+
+    if (!excludedShops.includes(ot_fb_shop) && (isIPv4(ip) || isIPv6(ip))) {
+      detectedIP = isIPv6(ip) ? ip : ipv4ToIpv6(ip);
+    }
+
+    return detectedIP;
+  } catch (error) {
     return "";
   }
 }
@@ -374,22 +382,43 @@ var fb_pageURL = otConvertPageUrl(),
     external_id: externalID,
   },
   ot_ip = "";
-async function trackEventFBConversionAPI(t, e = !1) {
-  "" != (ot_ip = "" == ot_ip ? await otDetectIP() : ot_ip) &&
-    (localStorage.setItem("ot_ip_v6", ot_ip),
-    t.append("client_ip_address", ot_ip));
-  var o = JSON.parse(localStorage.getItem("ot_omega_settings")),
-    n =
-      "InitiateCheckout" == (n = t.get("action"))
-        ? "capi_track_checkout"
-        : ("capi_track_" + n).toLocaleLowerCase();
-  (e || null == o?.settings[n] || o?.settings[n]) &&
-    fetch(rootlinkFBPixel + "/client/facebook-conversion-api.php", {
-      method: "POST",
-      body: t,
-    }).catch(function (t) {
-      console.log(t);
-    });
+async function trackEventFBConversionAPI(formData, forceSend = false) {
+  // Detect IP if not already set
+  if (!ot_ip) {
+    ot_ip = await otDetectIP();
+  }
+
+  if (ot_ip) {
+    localStorage.setItem("ot_ip_v6", ot_ip);
+    formData.append("client_ip_address", ot_ip);
+  }
+
+  // Retrieve settings from local storage
+  const omegaSettings = JSON.parse(localStorage.getItem("ot_omega_settings"));
+
+  // Determine the event name
+  const action = formData.get("action");
+  const eventName =
+    action === "InitiateCheckout"
+      ? "capi_track_checkout"
+      : `capi_track_${action}`.toLowerCase();
+
+  // Check if the event should be sent
+  const shouldSendEvent =
+    forceSend ||
+    !omegaSettings?.settings[eventName] ||
+    omegaSettings?.settings[eventName];
+
+  if (shouldSendEvent) {
+    try {
+      await fetch(`${rootlinkFBPixel}/client/facebook-conversion-api.php`, {
+        method: "POST",
+        body: formData,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }
 function saveLogEventIp(t, e, o, n) {
   fetch(
