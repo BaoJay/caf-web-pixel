@@ -177,11 +177,13 @@ function otFBDetectExternalID() {
   const userId = otGetCookie("c_user");
   let externalId = otGetCookie("ex_id");
 
+  // If the user is logged in, use the user ID as the external ID
   if (userId !== null && userId !== "") {
     otSetCookie("ex_id", externalId, 14);
     return userId;
   }
 
+  // If the external ID is not set, generate a new one
   if (externalId === null || externalId === "") {
     externalId = generateEventID(10);
     otSetCookie("ex_id", externalId, 14);

@@ -24,7 +24,33 @@ const CHECKOUT_COMPLETED_EVENT = getLocalStorageData(
 );
 const GB_TRIGGER_SEARCH_EVENT = getLocalStorageData("GB_TRIGGER_SEARCH");
 
-// IP ADDRESS related
+// ======================= Cookies related functions =======================
+function gbSetCookie(name, value, days) {
+  const date = new Date();
+  date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+  const expires = "expires=" + date.toGMTString();
+  document.cookie = `${name}=${value};${expires};path=/`;
+}
+function gbGetCookie(name) {
+  const nameEQ = name + "=";
+  const cookies = document.cookie.split(";");
+
+  for (const cookie of cookies) {
+    let cookieTrimmed = cookie.trim();
+    if (cookieTrimmed.startsWith(nameEQ)) {
+      return cookieTrimmed.substring(nameEQ.length, cookieTrimmed.length);
+    }
+  }
+  return "";
+}
+function gbDeleteCookie(name) {
+  const date = new Date();
+  date.setTime(date.getTime() + 0); // Set the expiration date to the past
+  const expires = "expires=" + date.toUTCString();
+  document.cookie = `${name}=;${expires};path=/`;
+}
+
+// ======================= IP ADDRESS related functions =======================
 let gb_ip = "";
 function getIP() {
   return fetch("https://www.cloudflare.com/cdn-cgi/trace").then((t) =>
