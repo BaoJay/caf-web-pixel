@@ -200,7 +200,7 @@ async function otDetectIP() {
 
     return detectedIP;
   } catch (error) {
-    return "";
+    return "Something went wrong with otDetectIP";
   }
 }
 
@@ -231,15 +231,16 @@ window.gbfbq = async function (
   pixelID,
   eventName,
   payload,
-  eventID,
+  eventPayload,
   nameCustomEvent
 ) {
-  if (!eventID || eventID === "") {
-    eventID = new Date().getTime();
+  if (!eventPayload || eventPayload === "") {
+    eventPayload = new Date().getTime();
   }
+  const { eventID } = eventPayload;
   const userIP = await otDetectIP();
   const eventAdvancedMatching = {
-    eventID,
+    external_id: eventPayload.client_id,
     client_ip_address: userIP,
   };
   console.log("eventAdvancedMatching", eventAdvancedMatching);
@@ -294,8 +295,12 @@ function convertShopifyToMetaEventName(eventName) {
 function triggerEvent(event, payload) {
   const metaEventName = convertShopifyToMetaEventName(event.name);
   console.log("event", event);
+  const eventPayload = {
+    eventID: event.id,
+    client_id: event.clientId,
+  };
   metaPixelIDs.forEach((metaPixelID) => {
-    gbfbq(metaPixelID, metaEventName, payload, event.id);
+    gbfbq(metaPixelID, metaEventName, payload, eventPayload);
   });
 }
 
