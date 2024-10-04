@@ -90,57 +90,65 @@ function otTrackEventConversionAPI(t, e) {
       console.log(t);
     });
 }
-function otSaveAdvancedMatchings(t) {
-  var e = null != t.email ? t.email : "",
-    o =
-      null != t.shippingAddress.city
-        ? t.shippingAddress.city.toLowerCase()
-        : "",
-    n = null != t.shippingAddress.phone ? t.shippingAddress.phone : "",
-    a = null != t.shippingAddress.zip ? t.shippingAddress.zip : "",
-    r =
-      null != t.shippingAddress.firstName
-        ? t.shippingAddress.firstName.toLowerCase()
-        : "",
-    i =
-      null != t.shippingAddress.lastName
-        ? t.shippingAddress.lastName.toLowerCase()
-        : "",
-    c =
-      null != t.shippingAddress.countryCode
-        ? t.shippingAddress.countryCode.toLowerCase()
-        : "",
-    t =
-      null != t.shippingAddress.provinceCode
-        ? t.shippingAddress.provinceCode.toLowerCase()
-        : "",
-    s = {
-      em: e,
-      ct: o,
-      ph: n,
-      zp: a,
-      fn: r,
-      ln: i,
-      external_id: externalID,
-      country: c,
-      st: t,
-    },
-    c = Object.keys(s);
-  if (0 < c.length) for (const d of c) "" == s[d] && delete s[d];
-  window.localStorage.setItem("OT_DATA_CUSTOMER__TRACK_FB", JSON.stringify(s)),
-    (OT_DATA_CUSTOMER__TRACK_FB = s),
-    window.localStorage.setItem(
-      "OT_DATA_CUSTOMER",
-      JSON.stringify({
-        em: e,
-        ct: o,
-        ph: n,
-        zp: a,
-        first_name: r,
-        last_name: i,
-        external_id: externalID,
-      })
-    );
+function otSaveAdvancedMatchings(data) {
+  const email = data.email || "";
+  const city = data.shippingAddress.city
+    ? data.shippingAddress.city.toLowerCase()
+    : "";
+  const phone = data.shippingAddress.phone || "";
+  const zip = data.shippingAddress.zip || "";
+  const firstName = data.shippingAddress.firstName
+    ? data.shippingAddress.firstName.toLowerCase()
+    : "";
+  const lastName = data.shippingAddress.lastName
+    ? data.shippingAddress.lastName.toLowerCase()
+    : "";
+  const countryCode = data.shippingAddress.countryCode
+    ? data.shippingAddress.countryCode.toLowerCase()
+    : "";
+  const provinceCode = data.shippingAddress.provinceCode
+    ? data.shippingAddress.provinceCode.toLowerCase()
+    : "";
+
+  const advancedMatchings = {
+    em: email,
+    ct: city,
+    ph: phone,
+    zp: zip,
+    fn: firstName,
+    ln: lastName,
+    external_id: externalID,
+    country: countryCode,
+    st: provinceCode,
+  };
+
+  // Remove empty values
+  Object.keys(advancedMatchings).forEach((key) => {
+    if (advancedMatchings[key] === "") {
+      delete advancedMatchings[key];
+    }
+  });
+
+  window.localStorage.setItem(
+    "OT_DATA_CUSTOMER__TRACK_FB",
+    JSON.stringify(advancedMatchings)
+  );
+  OT_DATA_CUSTOMER__TRACK_FB = advancedMatchings;
+
+  const basicMatchings = {
+    em: email,
+    ct: city,
+    ph: phone,
+    zp: zip,
+    first_name: firstName,
+    last_name: lastName,
+    external_id: externalID,
+  };
+
+  window.localStorage.setItem(
+    "OT_DATA_CUSTOMER",
+    JSON.stringify(basicMatchings)
+  );
 }
 function otGetContentCategories(t) {
   let o = [];
@@ -551,289 +559,306 @@ null !== localStorage.getItem("ot_ip_v6") &&
           (JSON.parse(localStorage.getItem("OT_DATA_TRIGGER_EVENT")),
           omegaCallBackPageView(t.settings.capi_track_pageview)),
         localStorage.setItem("ot_omega_settings", JSON.stringify(t)));
-  }),
-  (function (window, document) {
-    if (!window.fbq) {
-      const fbq = function () {
-        if (fbq.callMethod) {
-          fbq.callMethod.apply(fbq, arguments);
-        } else {
-          fbq.queue.push(arguments);
-        }
-      };
-
-      if (!window._fbq) {
-        window._fbq = fbq;
+  });
+(function (window, document) {
+  if (!window.fbq) {
+    const fbq = function () {
+      if (fbq.callMethod) {
+        fbq.callMethod.apply(fbq, arguments);
+      } else {
+        fbq.queue.push(arguments);
       }
-
-      fbq.push = fbq;
-      fbq.loaded = true;
-      fbq.version = "2.0";
-      fbq.queue = [];
-
-      const script = document.createElement("script");
-      script.async = true;
-      script.src = "https://connect.facebook.net/en_US/fbevents.js";
-
-      const firstScript = document.getElementsByTagName("script")[0];
-      firstScript.parentNode.insertBefore(script, firstScript);
-    }
-  })(window, document),
-  (window.otfbq = async function () {
-    var e, o, n, a;
-    if (
-      (otLogNameBaseCode("FB"), 0 < arguments.length) &&
-      ("string" == typeof arguments[0] && (e = arguments[0]),
-      "string" == typeof arguments[1] && (o = arguments[1]),
-      "object" == typeof arguments[2] && (n = arguments[2]),
-      void 0 !== arguments[3] && (a = arguments[3]),
-      void 0 !== arguments[4] && (nameCustomEvent = arguments[4]),
-      ("" != a && void 0 !== a) ||
-        (a = new Date().getTime() + getRandomInt(1, 1e5)),
-      "string" == typeof e &&
-        "" != e.replace(/\s+/gi, "") &&
-        "string" == typeof o &&
-        o.replace(/\s+/gi, ""))
-    ) {
-      "" == ot_ip && (ot_ip = await otDetectIP());
-      let t = {
-        ...OT_DATA_CUSTOMER__TRACK_FB,
-      };
-      switch (
-        ("" != ot_ip &&
-          (localStorage.setItem("ot_ip_v6", ot_ip),
-          (t = {
-            ...t,
-            client_ip_address: ot_ip,
-          })),
-        fbq("init", e, t),
-        o)
-      ) {
-        case "PageView":
-          fbq(
-            "trackSingle",
-            e,
-            "PageView",
-            {},
-            {
-              eventID: a,
-            }
-          );
-          break;
-        case "ViewContent":
-        case "Search":
-        case "AddToCart":
-        case "InitiateCheckout":
-        case "AddPaymentInfo":
-        case "Lead":
-        case "CompleteRegistration":
-        case "Purchase":
-        case "AddToWishlist":
-          fbq("trackSingle", e, o, n, {
-            eventID: a,
-          });
-          break;
-        case "trackCustom":
-          fbq("trackSingle", e, nameCustomEvent, n, {
-            eventID: a,
-          });
-          break;
-        default:
-          return;
-      }
-    }
-  }),
-  (window.omegaCallBackPageView = function (t = !1) {
-    if (
-      -1 == fb_pageURL.indexOf("/processing") &&
-      -1 == fb_pageURL.indexOf("/thank_you") &&
-      -1 == fb_pageURL.indexOf("/products/")
-    ) {
-      let o = generateEventID(36);
-      var e = localStorage.getItem("ot_omega_px").split(","),
-        e =
-          (e.forEach(function (t, e) {
-            otfbq("" + t, "PageView", {}, o);
-          }),
-          otFormatFormData(e, o));
-      e.append("action", "PageView"),
-        e.append("event_source_url", fb_pageURL),
-        trackEventFBConversionAPI(e, t);
-    }
-  }),
-  (window.omegaCallBackPaymentInfo = function (t) {
-    let o = generateEventID(36);
-    var e = localStorage.getItem("ot_omega_px").split(",");
-    let n = [],
-      a = [],
-      r = [];
-    var i = otGetContentCategories(t.data.checkout.lineItems);
-    let c =
-        "1" ==
-        JSON.parse(localStorage.getItem("ot_omega_settings")).settings
-          .content_type_event
-          ? "product"
-          : "product_group",
-      s = 0,
-      d =
-        (t.data.checkout.lineItems.forEach(function (t, e) {
-          n.push(("product" == c ? t.variant : t.variant.product).id),
-            r.push({
-              id: ("product" == c ? t.variant : t.variant.product).id,
-              name: t.title,
-              quantity: t.quantity,
-              item_price: t.quantity * t.variant.price.amount,
-              item_category: t.variant.product.type,
-            }),
-            "" != t.variant.product.vendor && a.push(t.variant.product.vendor),
-            (s += parseInt(t.quantity));
-        }),
-        {
-          content_ids: n,
-          content_category: i,
-          content_brand: [...new Set(a)].toString(),
-          contents: JSON.stringify(t.data.checkout.lineItems),
-          content_type: c,
-          value: t.data.checkout.totalPrice.amount,
-          num_items: s,
-          currency: t.data.checkout.currencyCode,
-        });
-    (d = removeElementInObject(d, "")),
-      e.forEach(function (t, e) {
-        otfbq("" + t, "AddPaymentInfo", d, o);
-      });
-    e = otFormatFormData(e, o);
-    e.append("action", "AddPaymentInfo"),
-      e.append("event_source_url", fb_pageURL),
-      e.append("content_ids", n),
-      e.append("content_type", c),
-      e.append("content_category", i),
-      e.append("content_brand", a),
-      e.append("contents", JSON.stringify(r)),
-      e.append("num_items", s),
-      e.append("value", t.data.checkout.totalPrice.amount),
-      e.append("currency", t.data.checkout.currencyCode),
-      trackEventFBConversionAPI(e);
-  }),
-  (window.omegaCallBackCheckout = function (t) {
-    const a = t;
-    let r = [],
-      i = [],
-      c = [],
-      s = localStorage.getItem("ot_omega_px").split(",");
-    let d =
-        "1" ==
-        JSON.parse(localStorage.getItem("ot_omega_settings")).settings
-          .content_type_event
-          ? "product"
-          : "product_group",
-      p = [],
-      _ = otGetContentCategories(a.data.checkout.lineItems),
-      l = 0;
-    a.data.checkout.lineItems.forEach((t, e) => {
-      if (
-        (i.push(t.title),
-        r.push(("product" == d ? t.variant : t.variant.product).id),
-        "" != t.variant.product.vendor &&
-          null != t.variant.product.vendor &&
-          c.push(t.variant.product.vendor),
-        p.push({
-          id: ("product" == d ? t.variant : t.variant.product).id,
-          name: t.title,
-          quantity: t.quantity,
-          item_price: t.quantity * t.variant.price.amount,
-          item_category: t.variant.product.type,
-        }),
-        (l += parseInt(t.quantity)),
-        e == a.data.checkout.lineItems.length - 1)
-      ) {
-        let o = generateEventID(36),
-          n = {
-            content_type: d,
-            content_category: _,
-            content_brand: [...new Set(c)].toString(),
-            content_ids: r,
-            currency: a.data.checkout.currencyCode,
-            value: a.data.checkout.totalPrice.amount,
-            num_items: l,
-            content_name: i,
-            contents: JSON.stringify(p),
-          };
-        s.forEach(function (t, e) {
-          otfbq("" + t, "InitiateCheckout", n, o);
-        });
-        t = otFormatFormData(s, o);
-        t.append("action", "InitiateCheckout"),
-          t.append("event_source_url", fb_pageURL),
-          t.append("content_ids", r),
-          t.append("content_type", d),
-          t.append("content_category", _),
-          t.append("content_brand", c),
-          t.append("contents", JSON.stringify(p)),
-          t.append("num_items", l),
-          t.append("value", a.data.checkout.totalPrice.amount),
-          t.append("content_name", i),
-          t.append("currency", a.data.checkout.currencyCode),
-          trackEventFBConversionAPI(t);
-      }
-    });
-  }),
-  (window.omegaCallBackPurchases = function (t) {
-    const o = t;
-    otSaveAdvancedMatchings(o.data.checkout);
-    t = localStorage.getItem("ot_omega_px").split(",");
-    let n = generateEventID(36);
-    t.forEach(function (t, e) {
-      otfbq("" + t, "PageView", {}, n);
-    });
-    var e = otFormatFormData(t, n),
-      e =
-        (e.append("action", "PageView"),
-        e.append("event_source_url", fb_pageURL),
-        trackEventFBConversionAPI(e),
-        JSON.parse(localStorage.getItem("ot_omega_settings")));
-    let a = [],
-      r = [],
-      i = [],
-      c = "1" == e.settings.content_type_event ? "product" : "product_group",
-      s = 0;
-    o.data.checkout.lineItems.forEach(function (t, e) {
-      a.push(("product" == c ? t.variant : t.variant.product).id),
-        i.push({
-          id: ("product" == c ? t.variant : t.variant.product).id,
-          name: t.title,
-          quantity: t.quantity,
-          item_price: t.quantity * t.variant.price.amount,
-          item_category: t.variant.product.type,
-        }),
-        "" != t.variant.product.vendor && r.push(t.variant.product.vendor),
-        (s += parseInt(t.quantity));
-    });
-    e = otGetContentCategories(o.data.checkout.lineItems);
-    let d = {
-      content_ids: a,
-      content_category: e,
-      content_brand: [...new Set(r)].toString(),
-      contents: JSON.stringify(i),
-      content_type: c,
-      value: o.data.checkout.totalPrice.amount,
-      currency: o.data.checkout.currencyCode,
-      num_items: s,
     };
-    (d = removeElementInObject(d, "")),
-      t.forEach(function (t, e) {
-        otfbq("" + t, "Purchase", d, o.data.checkout.order.id);
+
+    if (!window._fbq) {
+      window._fbq = fbq;
+    }
+
+    fbq.push = fbq;
+    fbq.loaded = true;
+    fbq.version = "2.0";
+    fbq.queue = [];
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://connect.facebook.net/en_US/fbevents.js";
+
+    const firstScript = document.getElementsByTagName("script")[0];
+    firstScript.parentNode.insertBefore(script, firstScript);
+  }
+})(window, document);
+window.otfbq = async function () {
+  var e, o, n, a;
+  if (
+    (otLogNameBaseCode("FB"), 0 < arguments.length) &&
+    ("string" == typeof arguments[0] && (e = arguments[0]),
+    "string" == typeof arguments[1] && (o = arguments[1]),
+    "object" == typeof arguments[2] && (n = arguments[2]),
+    void 0 !== arguments[3] && (a = arguments[3]),
+    void 0 !== arguments[4] && (nameCustomEvent = arguments[4]),
+    ("" != a && void 0 !== a) ||
+      (a = new Date().getTime() + getRandomInt(1, 1e5)),
+    "string" == typeof e &&
+      "" != e.replace(/\s+/gi, "") &&
+      "string" == typeof o &&
+      o.replace(/\s+/gi, ""))
+  ) {
+    "" == ot_ip && (ot_ip = await otDetectIP());
+    let t = {
+      ...OT_DATA_CUSTOMER__TRACK_FB,
+    };
+    switch (
+      ("" != ot_ip &&
+        (localStorage.setItem("ot_ip_v6", ot_ip),
+        (t = {
+          ...t,
+          client_ip_address: ot_ip,
+        })),
+      fbq("init", e, t),
+      o)
+    ) {
+      case "PageView":
+        fbq(
+          "trackSingle",
+          e,
+          "PageView",
+          {},
+          {
+            eventID: a,
+          }
+        );
+        break;
+      case "ViewContent":
+      case "Search":
+      case "AddToCart":
+      case "InitiateCheckout":
+      case "AddPaymentInfo":
+      case "Lead":
+      case "CompleteRegistration":
+      case "Purchase":
+      case "AddToWishlist":
+        fbq("trackSingle", e, o, n, {
+          eventID: a,
+        });
+        break;
+      case "trackCustom":
+        fbq("trackSingle", e, nameCustomEvent, n, {
+          eventID: a,
+        });
+        break;
+      default:
+        return;
+    }
+  }
+};
+window.omegaCallBackPageView = function (t = !1) {
+  if (
+    -1 == fb_pageURL.indexOf("/processing") &&
+    -1 == fb_pageURL.indexOf("/thank_you") &&
+    -1 == fb_pageURL.indexOf("/products/")
+  ) {
+    let o = generateEventID(36);
+    var e = localStorage.getItem("ot_omega_px").split(","),
+      e =
+        (e.forEach(function (t, e) {
+          otfbq("" + t, "PageView", {}, o);
+        }),
+        otFormatFormData(e, o));
+    e.append("action", "PageView"),
+      e.append("event_source_url", fb_pageURL),
+      trackEventFBConversionAPI(e, t);
+  }
+};
+window.omegaCallBackPaymentInfo = function (t) {
+  let o = generateEventID(36);
+  var e = localStorage.getItem("ot_omega_px").split(",");
+  let n = [],
+    a = [],
+    r = [];
+  var i = otGetContentCategories(t.data.checkout.lineItems);
+  let c =
+      "1" ==
+      JSON.parse(localStorage.getItem("ot_omega_settings")).settings
+        .content_type_event
+        ? "product"
+        : "product_group",
+    s = 0,
+    d =
+      (t.data.checkout.lineItems.forEach(function (t, e) {
+        n.push(("product" == c ? t.variant : t.variant.product).id),
+          r.push({
+            id: ("product" == c ? t.variant : t.variant.product).id,
+            name: t.title,
+            quantity: t.quantity,
+            item_price: t.quantity * t.variant.price.amount,
+            item_category: t.variant.product.type,
+          }),
+          "" != t.variant.product.vendor && a.push(t.variant.product.vendor),
+          (s += parseInt(t.quantity));
       }),
-      localStorage.setItem("item_count", 0);
-  }),
-  (window.omegaCallBackEvent = function (t) {
-    "product_added_to_cart" === t.name &&
-      parent.postMessage("ot_track_add_to_cart:" + JSON.stringify(t), "*");
-  }),
-  null != localStorage.getItem("ot_omega_settings") &&
-    setTimeout(() => {
-      omegaCallBackPageView();
-    }, 500);
+      {
+        content_ids: n,
+        content_category: i,
+        content_brand: [...new Set(a)].toString(),
+        contents: JSON.stringify(t.data.checkout.lineItems),
+        content_type: c,
+        value: t.data.checkout.totalPrice.amount,
+        num_items: s,
+        currency: t.data.checkout.currencyCode,
+      });
+  (d = removeElementInObject(d, "")),
+    e.forEach(function (t, e) {
+      otfbq("" + t, "AddPaymentInfo", d, o);
+    });
+  e = otFormatFormData(e, o);
+  e.append("action", "AddPaymentInfo"),
+    e.append("event_source_url", fb_pageURL),
+    e.append("content_ids", n),
+    e.append("content_type", c),
+    e.append("content_category", i),
+    e.append("content_brand", a),
+    e.append("contents", JSON.stringify(r)),
+    e.append("num_items", s),
+    e.append("value", t.data.checkout.totalPrice.amount),
+    e.append("currency", t.data.checkout.currencyCode),
+    trackEventFBConversionAPI(e);
+};
+window.omegaCallBackCheckout = function (t) {
+  const a = t;
+  let r = [],
+    i = [],
+    c = [],
+    s = localStorage.getItem("ot_omega_px").split(",");
+  let d =
+      "1" ==
+      JSON.parse(localStorage.getItem("ot_omega_settings")).settings
+        .content_type_event
+        ? "product"
+        : "product_group",
+    p = [],
+    _ = otGetContentCategories(a.data.checkout.lineItems),
+    l = 0;
+  a.data.checkout.lineItems.forEach((t, e) => {
+    if (
+      (i.push(t.title),
+      r.push(("product" == d ? t.variant : t.variant.product).id),
+      "" != t.variant.product.vendor &&
+        null != t.variant.product.vendor &&
+        c.push(t.variant.product.vendor),
+      p.push({
+        id: ("product" == d ? t.variant : t.variant.product).id,
+        name: t.title,
+        quantity: t.quantity,
+        item_price: t.quantity * t.variant.price.amount,
+        item_category: t.variant.product.type,
+      }),
+      (l += parseInt(t.quantity)),
+      e == a.data.checkout.lineItems.length - 1)
+    ) {
+      let o = generateEventID(36),
+        n = {
+          content_type: d,
+          content_category: _,
+          content_brand: [...new Set(c)].toString(),
+          content_ids: r,
+          currency: a.data.checkout.currencyCode,
+          value: a.data.checkout.totalPrice.amount,
+          num_items: l,
+          content_name: i,
+          contents: JSON.stringify(p),
+        };
+      s.forEach(function (t, e) {
+        otfbq("" + t, "InitiateCheckout", n, o);
+      });
+      t = otFormatFormData(s, o);
+      t.append("action", "InitiateCheckout"),
+        t.append("event_source_url", fb_pageURL),
+        t.append("content_ids", r),
+        t.append("content_type", d),
+        t.append("content_category", _),
+        t.append("content_brand", c),
+        t.append("contents", JSON.stringify(p)),
+        t.append("num_items", l),
+        t.append("value", a.data.checkout.totalPrice.amount),
+        t.append("content_name", i),
+        t.append("currency", a.data.checkout.currencyCode),
+        trackEventFBConversionAPI(t);
+    }
+  });
+};
+
+// Purchase event callback function
+window.omegaCallBackPurchases = function (event) {
+  const checkoutData = event.data.checkout;
+  otSaveAdvancedMatchings(checkoutData);
+
+  const pixelIds = localStorage.getItem("ot_omega_px").split(",");
+  const eventId = generateEventID(36);
+
+  pixelIds.forEach((pixelId) => {
+    otfbq(pixelId, "PageView", {}, eventId);
+  });
+
+  let formData = otFormatFormData(pixelIds, eventId);
+  formData.append("action", "PageView");
+  formData.append("event_source_url", fb_pageURL);
+  trackEventFBConversionAPI(formData);
+
+  const settings = JSON.parse(localStorage.getItem("ot_omega_settings"));
+  const contentType =
+    settings.settings.content_type_event === "1" ? "product" : "product_group";
+
+  const lineItems = checkoutData.lineItems;
+  const contentIds = [];
+  const contentBrands = [];
+  const contents = [];
+  let totalItems = 0;
+
+  lineItems.forEach((item) => {
+    const productId =
+      contentType === "product" ? item.variant.id : item.variant.product.id;
+    contentIds.push(productId);
+    contents.push({
+      id: productId,
+      name: item.title,
+      quantity: item.quantity,
+      item_price: item.quantity * item.variant.price.amount,
+      item_category: item.variant.product.type,
+    });
+    if (item.variant.product.vendor) {
+      contentBrands.push(item.variant.product.vendor);
+    }
+    totalItems += parseInt(item.quantity);
+  });
+
+  const contentCategory = otGetContentCategories(lineItems);
+  const purchaseData = {
+    content_ids: contentIds,
+    content_category: contentCategory,
+    content_brand: [...new Set(contentBrands)].toString(),
+    contents: JSON.stringify(contents),
+    content_type: contentType,
+    value: checkoutData.totalPrice.amount,
+    currency: checkoutData.currencyCode,
+    num_items: totalItems,
+  };
+
+  const cleanedPurchaseData = removeElementInObject(purchaseData, "");
+
+  pixelIds.forEach((pixelId) => {
+    otfbq(pixelId, "Purchase", cleanedPurchaseData, checkoutData.order.id);
+  });
+
+  localStorage.setItem("item_count", 0);
+};
+window.omegaCallBackEvent = function (t) {
+  "product_added_to_cart" === t.name &&
+    parent.postMessage("ot_track_add_to_cart:" + JSON.stringify(t), "*");
+};
+null != localStorage.getItem("ot_omega_settings") &&
+  setTimeout(() => {
+    omegaCallBackPageView();
+  }, 500);
 var EVENT_CHECKOUT = JSON.parse(
     localStorage.getItem("OT_DATA_TRIGGER_CHECKOUT")
   ),
