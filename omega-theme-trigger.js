@@ -532,19 +532,39 @@ function otLogNameBaseCode(t) {
     ),
     (window.otLogInformationCode = !1));
 }
-function otFormatFormData(t, e = generateEventID(36), o = ot_fb_shop) {
-  for (var n, a, r, i, c, s, d = new FormData(), p = 0; p < t.length; p++)
-    d.append("pixels[]", t[p]);
-  for ([n, a] of Object.entries(OT_DATA_CUSTOMER)) d.append(n, a || "");
-  for ([r, i] of Object.entries(ot_information_campaign)) d.append(r, i || "");
-  for ([c, s] of Object.entries(otGetAttributeFBCAndFBP()))
-    d.append("obj_fbp_fbc[" + c + "]", s || "");
-  return (
-    d.append("shop", o),
-    d.append("event_id", e),
-    d.append("external_id", externalID || ""),
-    d
-  );
+function otFormatFormData(
+  pixels,
+  eventId = generateEventID(36),
+  shop = ot_fb_shop
+) {
+  const formData = new FormData();
+
+  // Append pixels
+  pixels.forEach((pixel) => {
+    formData.append("pixels[]", pixel);
+  });
+
+  // Append OT_DATA_CUSTOMER entries
+  Object.entries(OT_DATA_CUSTOMER).forEach(([key, value]) => {
+    formData.append(key, value || "");
+  });
+
+  // Append ot_information_campaign entries
+  Object.entries(ot_information_campaign).forEach(([key, value]) => {
+    formData.append(key, value || "");
+  });
+
+  // Append otGetAttributeFBCAndFBP entries
+  Object.entries(otGetAttributeFBCAndFBP()).forEach(([key, value]) => {
+    formData.append(`obj_fbp_fbc[${key}]`, value || "");
+  });
+
+  // Append additional fields
+  formData.append("shop", shop);
+  formData.append("event_id", eventId);
+  formData.append("external_id", externalID || "");
+
+  return formData;
 }
 null !== localStorage.getItem("ot_ip_v6") &&
   (ot_ip = localStorage.getItem("ot_ip_v6")),
