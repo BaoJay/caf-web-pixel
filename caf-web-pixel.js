@@ -1,3 +1,6 @@
+// Define CAF backend server URL
+const CAF_BACKEND_URL = "https://ttgumirxpi.ap-southeast-2.awsapprunner.com/";
+
 // Return false or data
 function getLocalStorageData(key) {
   return (
@@ -279,6 +282,17 @@ window.gbfbq = async function (
   }
 };
 
+async function gbConvertionEvent(eventName, payload) {
+  // Send data to CAF backend
+  await fetch(CAF_BACKEND_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ eventName, payload }),
+  });
+}
+
 function convertShopifyToMetaEventName(eventName) {
   if (eventName === "page_viewed") return "PageView";
   if (eventName === "product_viewed") return "ViewContent";
@@ -301,6 +315,7 @@ function triggerEvent(event, payload) {
   };
   metaPixelIDs.forEach((metaPixelID) => {
     gbfbq(metaPixelID, metaEventName, payload, eventPayload);
+    gbConvertionEvent(metaEventName, payload);
   });
 }
 
