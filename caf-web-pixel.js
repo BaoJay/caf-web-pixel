@@ -1,8 +1,5 @@
 // Define CAF backend server URL
-const isProduction = window.location.hostname !== "localhost";
-const CAF_BACKEND_URL = isProduction
-  ? "https://ttgumirxpi.ap-southeast-2.awsapprunner.com/"
-  : "http://localhost:3000/";
+const CAF_BACKEND_URL = "https://ttgumirxpi.ap-southeast-2.awsapprunner.com/";
 
 // Return false or data
 function getLocalStorageData(key) {
@@ -287,6 +284,7 @@ window.gbfbq = async function (
 
 function gbConvertionEvent(metaPixelID, eventName, payload) {
   // Send data to CAF backend
+  console.log("Send data to CAF backend");
   fetch(CAF_BACKEND_URL, {
     method: "POST",
     headers: {
