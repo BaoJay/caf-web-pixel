@@ -1,7 +1,8 @@
 // Define CAF backend server URL
 // dev = "http://localhost:3000/"
 // prod = "https://ttgumirxpi.ap-southeast-2.awsapprunner.com/"
-const CAF_BACKEND_URL = "http://localhost:3000/";
+const CAF_BACKEND_URL =
+  "https://8ea9-2001-ee0-4f95-9ca0-a585-8ad7-f0b-4857.ngrok-free.app/";
 
 // Return false or data
 function getLocalStorageData(key) {
@@ -166,6 +167,11 @@ function isIPv4(ip) {
 
   return new RegExp(ipv4Pattern).test(ip);
 }
+async function getUserAgent() {
+  const response = await getIP();
+  const uag = response.split("uag=")[1].split("\n")[0];
+  return uag;
+}
 async function otDetectIP() {
   try {
     if (gb_ip !== "") return gb_ip;
@@ -284,15 +290,16 @@ window.gbfbq = async function (
   }
 };
 
-function gbConvertionEvent(metaPixelID, eventName, payload) {
+async function gbConvertionEvent(metaPixelID, eventName, payload) {
   // Send data to CAF backend
-  console.log("Send data to CAF backend");
+  console.log("Send data to CAF backend with URL === ", CAF_BACKEND_URL);
+  const userAgent = await getUserAgent();
   fetch(CAF_BACKEND_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ metaPixelID, eventName, payload }),
+    body: JSON.stringify({ metaPixelID, eventName, payload, userAgent }),
   })
     .then((response) => response.json())
     .then((data) => console.log(data))
