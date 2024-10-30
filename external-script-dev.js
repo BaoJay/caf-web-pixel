@@ -290,7 +290,7 @@ window.gbfbq = async function (
   }
 };
 
-async function gbConvertionEvent(
+async function gbConversionEvent(
   metaPixelID,
   eventName,
   payload,
@@ -339,7 +339,7 @@ function triggerEvent(event, payload) {
   };
   metaPixelIDs.forEach((metaPixelID) => {
     gbfbq(metaPixelID, metaEventName, payload, eventPayload);
-    gbConvertionEvent(metaPixelID, metaEventName, payload, eventPayload);
+    gbConversionEvent(metaPixelID, metaEventName, payload, eventPayload);
   });
 }
 
