@@ -1,7 +1,7 @@
 // Define CAF backend server URL
 // dev = "http://localhost:3000/"
 // prod = "https://ttgumirxpi.ap-southeast-2.awsapprunner.com/"
-const CAF_BACKEND_URL = "https://ttgumirxpi.ap-southeast-2.awsapprunner.com/";
+const CAF_BACKEND_URL = "http://localhost:3000/";
 
 // Return false or data
 function getLocalStorageData(key) {
