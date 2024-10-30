@@ -290,7 +290,12 @@ window.gbfbq = async function (
   }
 };
 
-async function gbConvertionEvent(metaPixelID, eventName, payload) {
+async function gbConvertionEvent(
+  metaPixelID,
+  eventName,
+  payload,
+  eventPayload
+) {
   // Send data to CAF backend
   console.log("Send data to CAF backend with URL === ", CAF_BACKEND_URL);
   const userAgent = await getUserAgent();
@@ -299,7 +304,13 @@ async function gbConvertionEvent(metaPixelID, eventName, payload) {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ metaPixelID, eventName, payload, userAgent }),
+    body: JSON.stringify({
+      metaPixelID,
+      eventName,
+      payload,
+      eventPayload,
+      userAgent,
+    }),
   })
     .then((response) => response.json())
     .then((data) => console.log(data))
@@ -328,7 +339,7 @@ function triggerEvent(event, payload) {
   };
   metaPixelIDs.forEach((metaPixelID) => {
     gbfbq(metaPixelID, metaEventName, payload, eventPayload);
-    gbConvertionEvent(metaPixelID, metaEventName, payload);
+    gbConvertionEvent(metaPixelID, metaEventName, payload, eventPayload);
   });
 }
 
