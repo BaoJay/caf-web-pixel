@@ -10,6 +10,7 @@ function getLocalStorageData(key) {
   );
 }
 const metaPixelIDs = getLocalStorageData("CAF_PIXEL_ID").split(",");
+console.log("metaPixelIDs", metaPixelIDs);
 
 const OTHER_EVENT = getLocalStorageData("GB_TRIGGER_EVENT");
 const PAGE_VIEWED_EVENT = getLocalStorageData("GB_TRIGGER_PAGE_VIEWED");
